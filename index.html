@@ -139,6 +139,8 @@ input[type=range]{flex:1;accent-color:var(--accent);min-width:100px}
     <div class="row"><label for="inSel">MIDI in</label><span class="sel"><select id="inSel"></select></span></div>
     <div class="row"><label for="outSel">MIDI out</label><span class="sel"><select id="outSel"></select></span></div>
     <div class="row"><label for="outCh">Out channel</label><span class="sel"><select id="outCh"></select></span></div>
+    <div class="row"><label for="clockSel" title="Follow MIDI clock from this port (e.g. your sequencer). Falls back to the manual tempo when no clock arrives.">Clock in</label><span class="sel" title="Follow MIDI clock from this port (e.g. your sequencer). Falls back to the manual tempo when no clock arrives."><select id="clockSel"></select></span></div>
+    <div class="row hidden" id="clockInfoRow" style="margin-top:-4px"><span class="lbl"></span><span class="clockinfo" id="clockInfo"></span></div>
     <div class="row"><span class="lbl">Monitor</span><button class="toggle" data-key="preview" title="Hear QuChord's output in the browser, as well as sending it out">Preview sound</button></div>
     <p class="tip">Send QuChord's output to your synth or sequencer, and switch off any direct route from the keyboard to the same place, or you'll hear the single note as well as the chord. If your keyboard has an MPE mode, turn it off: QuChord sends each chord on one channel.</p>
   </section>
@@ -148,8 +150,7 @@ input[type=range]{flex:1;accent-color:var(--accent);min-width:100px}
     <div class="row"><span class="lbl">Strum</span><div class="seg" id="strumModeSeg" data-key="strumMode"><button data-v="ms" title="Strum gap set in milliseconds">Time</button><button data-v="sync" title="Strum gap locked to the tempo as a note division">Tempo sync</button></div><span class="val" id="strumVal"></span></div>
     <div class="row" id="strumMsRow"><span class="lbl">Gap</span><input type="range" id="strum" min="0" max="150" step="1" title="Gap between each note of the chord"></div>
     <div class="row" id="strumDivRow"><span class="lbl">Division</span><div class="seg" id="divSeg" data-key="strumDiv" title="Gap between each note of the chord, as a note length at the current tempo"><button data-v="1/64">1/64</button><button data-v="1/32">1/32</button><button data-v="1/16T">1/16T</button><button data-v="1/16">1/16</button><button data-v="1/8T">1/8T</button><button data-v="1/8">1/8</button><button data-v="1/4">1/4</button></div></div>
-    <div class="row" id="tempoRow"><span class="lbl">Tempo</span><input type="number" id="bpm" min="30" max="300" step="0.1" title="Manual tempo, used when no MIDI clock is coming in"><button id="tap" title="Tap four or more times to set the tempo">Tap</button>
-      <span class="sel" style="max-width:220px" title="Follow MIDI clock from this port (e.g. your sequencer). Falls back to the manual tempo when no clock arrives."><select id="clockSel"></select></span><span class="clockinfo" id="clockInfo"></span></div>
+    <div class="row" id="tempoRow"><span class="lbl">Tempo</span><input type="number" id="bpm" min="30" max="300" step="0.1" title="Manual tempo, used when no MIDI clock is coming in"><button id="tap" title="Tap four or more times to set the tempo">Tap</button></div>
     <div class="row"><span class="lbl">Direction</span><div class="seg" id="dirSeg" data-key="strumDir"><button data-v="up">Up</button><button data-v="down">Down</button><button data-v="alt">Alternate</button></div></div>
     <div class="row"><span class="lbl">Velocity</span><div class="seg" id="velSeg" data-key="velMode"><button data-v="played">As played</button><button data-v="fixed">Fixed</button></div></div>
     <div class="row" id="velCurveRow"><span class="lbl">Curve</span><div class="seg" id="curveSeg" data-key="velCurve"><button data-v="softer" title="Much louder for light hits">Softer</button><button data-v="soft" title="Louder for light hits">Soft</button><button data-v="linear" title="As the keyboard sends it">Linear</button><button data-v="hard" title="Need to hit harder for loud notes">Hard</button></div></div>
@@ -159,7 +160,7 @@ input[type=range]{flex:1;accent-color:var(--accent);min-width:100px}
       <button class="toggle" data-key="latch" title="Chord keeps sounding until the next one">Latch</button>
       <button class="toggle" data-key="pass" title="Forward CC, pitch bend, pressure and program change">Pass CC / bend</button>
     </div>
-    <p class="tip"><b>Strum</b> spreads the chord's notes out in time like a strummed guitar: 15–40 ms is subtle, 80 ms+ is a harp-like roll. <b>Tempo sync</b> sets the gap as a note length instead, so a 1/16 strum on a 4-note chord rolls out over one beat in time with the track. Pick your sequencer's port as the clock port to follow its tempo, or type a tempo or tap it in. <b>Latch</b> keeps the chord sounding after you let go, until you play the next one. It's handy for holding a pad while you tweak the synth. <b>Velocity</b>: if your keys or pads need hitting hard, use <b>As played</b> with the <b>Soft</b> or <b>Softer</b> curve and raise <b>Minimum</b>. The readout under the chord name shows what comes in and what goes out. <b>Pass CC / bend</b> forwards the keyboard's pressure, aftertouch and pitch bend messages so modulation still works.</p>
+    <p class="tip"><b>Strum</b> spreads the chord's notes out in time like a strummed guitar: 15–40 ms is subtle, 80 ms+ is a harp-like roll. <b>Tempo sync</b> sets the gap as a note length instead, so a 1/16 strum on a 4-note chord rolls out over one beat in time with the track. Set <b>Clock in</b> (Routing) to your sequencer's port to follow its tempo, or type a tempo or tap it in. <b>Latch</b> keeps the chord sounding after you let go, until you play the next one. It's handy for holding a pad while you tweak the synth. <b>Velocity</b>: if your keys or pads need hitting hard, use <b>As played</b> with the <b>Soft</b> or <b>Softer</b> curve and raise <b>Minimum</b>. The readout under the chord name shows what comes in and what goes out. <b>Pass CC / bend</b> forwards the keyboard's pressure, aftertouch and pitch bend messages so modulation still works.</p>
   </section>
 
   <section class="card fx a-src">
@@ -219,12 +220,12 @@ input[type=range]{flex:1;accent-color:var(--accent);min-width:100px}
     <div class="row"><span class="lbl">Octaves</span><div class="seg" id="arpOctSeg" data-key="arpOct" title="How many octaves the pattern climbs through"><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button></div></div>
     <div class="row"><span class="lbl">Gate</span><input type="range" id="arpGate" min="10" max="100" title="How long each note lasts as a share of the step: short = staccato, 100% = legato"><span class="val" id="arpGateVal"></span></div>
     <div class="row"><span class="lbl">Swing</span><input type="range" id="arpSwing" min="50" max="75" title="50% = straight; 66% = triplet shuffle; 75% = hard swing"><span class="val" id="arpSwingVal"></span></div>
-    <p class="tip">The arpeggiator plays whatever QuChord would play (the chord's notes, or the keys you hold in <b>Single notes</b> mode) one at a time, in time with the tempo. For a bassline: choose <b>Single notes</b>, hold one key, set Octaves to 2 and try <b>Up</b> at 1/16. Hold two or three keys to make a pattern from them, and turn on <b>Latch</b> to keep it running hands-free. With a clock port selected in Performance, it locks to that MIDI clock, starts new notes on the next step and restarts its pattern when the sequencer starts. Without one, it uses the manual tempo there. <b>Gate</b> sets note length, and <b>Swing</b> delays every second step for shuffle.</p>
+    <p class="tip">The arpeggiator plays whatever QuChord would play (the chord's notes, or the keys you hold in <b>Single notes</b> mode) one at a time, in time with the tempo. For a bassline: choose <b>Single notes</b>, hold one key, set Octaves to 2 and try <b>Up</b> at 1/16. Hold two or three keys to make a pattern from them, and turn on <b>Latch</b> to keep it running hands-free. With a port chosen in <b>Clock in</b> (Routing), it locks to that MIDI clock, starts new notes on the next step and restarts its pattern when the sequencer starts. Without one, it uses the manual tempo in Performance. <b>Gate</b> sets note length, and <b>Swing</b> delays every second step for shuffle.</p>
   </section>
 
   <section class="kbwrap a-kb"><div class="kb" id="kb"></div></section>
 </main>
-<footer class="credit"><p class="line"><span>QuChord: made by OPT</span><span class="ver" title="Build 14">v1.0.3</span><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></p></footer>
+<footer class="credit"><p class="line"><span>QuChord: made by OPT</span><span class="ver" title="Build 15">v1.0.4</span><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></p></footer>
 
 <script>
 "use strict";
@@ -402,7 +403,8 @@ function tap(){
 }
 setInterval(()=>{
   const el=$('clockInfo'); if(!el) return;
-  if(clockInput){ el.textContent=clockLive()?clockBpm.toFixed(1)+' BPM':'no clock'; el.className='clockinfo'+(clockLive()?' live':''); }
+  $('clockInfoRow').classList.toggle('hidden',!clockInput);
+  if(clockInput){ el.textContent=clockLive()?'Following '+clockBpm.toFixed(1)+' BPM':'No clock arriving: using manual tempo'; el.className='clockinfo'+(clockLive()?' live':''); }
   else { el.textContent=''; el.className='clockinfo'; }
   if(S.strumMode==='sync') $('strumVal').textContent=strumLabel();
 },250);
