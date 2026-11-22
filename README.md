@@ -8,7 +8,7 @@ The whole app is one HTML file and runs in the browser with no install. Made by 
 
 **Use it now: https://opt-fx.github.io/quchord/**
 
-**Status: version 1.0.6.**
+**Status: version 1.1.**
 
 ## What it does
 
@@ -16,7 +16,11 @@ The whole app is one HTML file and runs in the browser with no install. Made by 
 - **Chord type.** Pick a chord (maj, min, 7, maj7, m7, m9, sus, dim, quartal and more) and every key plays it.
 - **Scale chords.** Choose a key and scale, and each key plays the chord that belongs to it: triads, 7ths or 9ths. The seven chords of the key are shown with their roman numerals, and you can click them to hear them.
 - **Single notes.** No chords: one note per key, for basslines and arpeggios.
-- **Voicing.** Inversions, open and drop-2 spacing, octave shift, an added bass note, smooth voice leading, and a voice limit to fit a synth's polyphony (it drops the least important notes first).
+- **Voicing.** Inversions, smooth voice leading, open and drop-2 spacing, and octave shift.
+- **Melody on top.** The key you press becomes the top note with the chord underneath, as the chord's root, 3rd or 5th, so a one-finger tune comes out harmonised.
+- **Bass.** Add the chord's root an octave below, or hold a **pedal** note under changing chords, while you play or as a constant drone.
+- **Keep in range.** Fold every chord into a window, so chords stay in one register anywhere on the keyboard.
+- **Voice limit.** Trim chords to fit a synth's polyphony, dropping the least important notes first.
 - **Strum.** Spread a chord's notes in milliseconds or as a note length locked to the tempo, upwards, downwards or alternating.
 - **Arpeggiator.** Up, Down, Up-Down, Down-Up, As played and Random, at 1/4 to 1/32 with triplets, over 1–4 octaves, with gate and swing. Latch keeps it running hands-free.
 - **Tempo.** Follows MIDI clock from a port you choose (for example a sequencer), or a tempo you type or tap in. A MIDI clock switch lets you ignore the clock and use your own tempo. The arpeggiator restarts its pattern when the clock starts.
