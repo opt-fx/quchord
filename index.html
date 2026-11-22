@@ -50,6 +50,7 @@ h1{font-size:18px;margin:0;letter-spacing:.02em}
 .status.warn{color:var(--amber);border-color:#5c4b22}
 button{font:inherit;color:inherit;background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:7px 11px;cursor:pointer;transition:background .12s,border-color .12s}
 button:hover{border-color:#454a51}
+button:disabled{opacity:.4;cursor:default}
 button.danger{background:#2a1513;border-color:#5a231c;color:#ff8a7c;font-weight:600}
 button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
 main{max-width:1280px;margin:0 auto;padding:10px 16px 8px;display:grid;gap:10px;grid-template-columns:repeat(3,minmax(0,1fr));
@@ -71,6 +72,7 @@ main{max-width:1280px;margin:0 auto;padding:10px 16px 8px;display:grid;gap:10px;
 .sel select{font:inherit;color:var(--text);background:transparent;border:0;outline:0;padding:7px 4px 7px 7px;flex:1;min-width:0;cursor:pointer}
 .sel select:disabled{cursor:default;color:var(--muted)}
 .sel option{background:var(--panel2);color:var(--text)}
+input[type=number]:disabled{color:var(--ok);opacity:.9}
 input[type=number]{font:500 13px var(--mono);color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:6px 8px;width:72px}
 #divSeg button{padding:5px 6px}#arpRateSeg button{padding:5px 7px}#arpPatSeg button{padding:5px 6px}
 .clockinfo{font:500 11px var(--mono);color:var(--muted)}
@@ -84,6 +86,8 @@ input[type=number]{font:500 13px var(--mono);color:var(--text);background:var(--
 .toggle{display:inline-flex;align-items:center;gap:7px;background:transparent;border:1px solid var(--line);padding:5px 10px 5px 7px;color:var(--muted)}
 .toggle::before{content:"";flex:none;width:26px;height:14px;border-radius:8px;background:radial-gradient(circle at 7px 50%,#9a9ea5 4.5px,transparent 5px),#33373c;transition:background .15s}
 .toggle[aria-pressed=true]{color:var(--text)}
+.toggle.warn[aria-pressed=true]{color:var(--amber)}
+.toggle.warn[aria-pressed=true]::before{background:radial-gradient(circle at 19px 50%,#fff 4.5px,transparent 5px),#8a6a1c}
 .toggle[aria-pressed=true]::before{background:radial-gradient(circle at 19px 50%,#fff 4.5px,transparent 5px),var(--accent)}
 .grid{display:grid;gap:7px}
 .slots{grid-template-columns:repeat(4,1fr)}
@@ -150,7 +154,8 @@ input[type=range]{flex:1;accent-color:var(--accent);min-width:100px}
     <div class="row"><span class="lbl">Strum</span><div class="seg" id="strumModeSeg" data-key="strumMode"><button data-v="ms" title="Strum gap set in milliseconds">Time</button><button data-v="sync" title="Strum gap locked to the tempo as a note division">Tempo sync</button></div><span class="val" id="strumVal"></span></div>
     <div class="row" id="strumMsRow"><span class="lbl">Gap</span><input type="range" id="strum" min="0" max="150" step="1" title="Gap between each note of the chord"></div>
     <div class="row" id="strumDivRow"><span class="lbl">Division</span><div class="seg" id="divSeg" data-key="strumDiv" title="Gap between each note of the chord, as a note length at the current tempo"><button data-v="1/64">1/64</button><button data-v="1/32">1/32</button><button data-v="1/16T">1/16T</button><button data-v="1/16">1/16</button><button data-v="1/8T">1/8T</button><button data-v="1/8">1/8</button><button data-v="1/4">1/4</button></div></div>
-    <div class="row" id="tempoRow"><span class="lbl">Tempo</span><input type="number" id="bpm" min="30" max="300" step="0.1" title="Manual tempo, used when no MIDI clock is coming in"><button id="tap" title="Tap four or more times to set the tempo">Tap</button></div>
+    <div class="row" id="tempoRow"><span class="lbl">Tempo</span><input type="number" id="bpm" min="30" max="300" step="0.1" title="Manual tempo, used when no MIDI clock is coming in"><button id="tap" title="Tap four or more times to set the tempo">Tap</button>
+      <button class="toggle" data-key="useClock" title="Follow the MIDI clock from the Clock in port (Routing). Off: use the manual tempo even if clock is arriving.">MIDI clock</button><span class="clockinfo" id="syncNote"></span></div>
     <div class="row"><span class="lbl">Direction</span><div class="seg" id="dirSeg" data-key="strumDir"><button data-v="up">Up</button><button data-v="down">Down</button><button data-v="alt">Alternate</button></div></div>
     <div class="row"><span class="lbl">Velocity</span><div class="seg" id="velSeg" data-key="velMode"><button data-v="played">As played</button><button data-v="fixed">Fixed</button></div></div>
     <div class="row" id="velCurveRow"><span class="lbl">Curve</span><div class="seg" id="curveSeg" data-key="velCurve"><button data-v="softer" title="Much louder for light hits">Softer</button><button data-v="soft" title="Louder for light hits">Soft</button><button data-v="linear" title="As the keyboard sends it">Linear</button><button data-v="hard" title="Need to hit harder for loud notes">Hard</button></div></div>
@@ -225,7 +230,7 @@ input[type=range]{flex:1;accent-color:var(--accent);min-width:100px}
 
   <section class="kbwrap a-kb"><div class="kb" id="kb"></div></section>
 </main>
-<footer class="credit"><p class="line"><span>QuChord: made by OPT</span><span class="ver" title="Build 15">v1.0.4</span><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></p></footer>
+<footer class="credit"><p class="line"><span>QuChord: made by OPT</span><span class="ver" title="Build 16">v1.0.5</span><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></p></footer>
 
 <script>
 "use strict";
@@ -295,7 +300,7 @@ const DEFAULTS = {
   inversion:0, spread:'close', octave:0, smooth:false, bass:false,
   strum:0, strumDir:'up', velMode:'played', velFixed:100, latch:false, pass:true, preview:false,
   voices:0, bypass:false, tips:false, layoutV:2,
-  strumMode:'ms', strumDiv:'1/16', bpm:120, clockName:'',
+  strumMode:'ms', strumDiv:'1/16', bpm:120, clockName:'', useClock:true,
   arpOn:false, arpPattern:'up', arpRate:'1/16', arpOct:1, arpGate:60, arpSwing:50, velCurve:'linear', velMin:1
 };
 let S = structuredClone(DEFAULTS);
@@ -368,7 +373,8 @@ function limitVoices(notes,root){
 const DIVS={'off':0,'1/64':1/16,'1/32':1/8,'1/16T':1/6,'1/16':1/4,'1/8T':1/3,'1/8':1/2,'1/4':1};
 let clockInput=null, clockTicks=[], lastClock=0, clockBpm=0, clockTick=0;
 const clockLive=()=>{ const d=performance.now()-lastClock; return d>=0 && d<1000 && clockBpm>20 && clockBpm<400; };
-const tempo=()=>clockLive()?clockBpm:S.bpm;
+const following=()=>S.useClock && clockLive();
+const tempo=()=>following()?clockBpm:S.bpm;
 const strumMs=()=>S.strumMode==='sync' ? (60000/tempo())*DIVS[S.strumDiv] : S.strum;
 function onClock(ev){
   const st=ev.data[0];
@@ -380,7 +386,7 @@ function onClock(ev){
   lastClock=t;
   if(clockTicks.length>=12){ const avg=clockTicks.reduce((a,b)=>a+b,0)/clockTicks.length; clockBpm=60000/(avg*24); }
   // arpeggiator locked to clock ticks (24 per quarter note)
-  if(S.arpOn && !S.bypass && clockLive()){
+  if(S.arpOn && !S.bypass && following()){
     const tps=Math.round(24*DIVS[S.arpRate]);
     if(clockTick%tps===0){
       if(arpPool().length){
@@ -404,7 +410,15 @@ function tap(){
 setInterval(()=>{
   const el=$('clockInfo'); if(!el) return;
   $('clockInfoRow').classList.toggle('hidden',!clockInput);
-  if(clockInput){ el.textContent=clockLive()?'Following '+clockBpm.toFixed(1)+' BPM':'No clock arriving: using manual tempo'; el.className='clockinfo'+(clockLive()?' live':''); }
+  const f=following(), bp=$('bpm'), sn=$('syncNote');
+  bp.disabled=f; $('tap').disabled=f;
+  if(f){ if(document.activeElement!==bp) bp.value=clockBpm.toFixed(1); sn.textContent=''; }
+  else { if(document.activeElement!==bp && +bp.value!==S.bpm) bp.value=S.bpm;
+    sn.textContent=''; }
+  const tg=document.querySelector('.toggle[data-key=useClock]'); const warn=S.useClock && !f;
+  tg.classList.toggle('warn',warn);
+  tg.title = !S.useClock ? 'MIDI clock off: using the manual tempo' : f ? 'Following MIDI clock from '+clockInput.name : clockInput ? 'No clock arriving on '+clockInput.name+': using the manual tempo' : 'Choose a port in Clock in (Routing) to follow MIDI clock. Using the manual tempo until then.';
+  if(clockInput){ el.textContent=!S.useClock?'MIDI clock off in Performance: using manual tempo':clockLive()?'Following '+clockBpm.toFixed(1)+' BPM':'No clock arriving: using manual tempo'; el.className='clockinfo'+(following()?' live':''); }
   else { el.textContent=''; el.className='clockinfo'; }
   if(S.strumMode==='sync') $('strumVal').textContent=strumLabel();
 },250);
@@ -441,7 +455,7 @@ function playStep(t,stepMs){
   arpTimers.add(tOn); arpTimers.add(tOff);
 }
 function arpTick(){
-  if(!S.arpOn || S.bypass || clockLive()){ arpNext=0; return; }
+  if(!S.arpOn || S.bypass || following()){ arpNext=0; return; }
   if(!arpPool().length){ arpNext=0; arpIdx=0; arpStep=0; return; }
   const now=performance.now(); if(!arpNext || arpNext<now-50) arpNext=now;
   while(arpNext<now+30){

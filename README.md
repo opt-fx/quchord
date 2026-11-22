@@ -8,7 +8,7 @@ The whole app is one HTML file and runs in the browser with no install. Made by 
 
 **Use it now: https://opt-fx.github.io/quchord/**
 
-**Status: version 1.0.4.**
+**Status: version 1.0.5.**
 
 ## What it does
 
@@ -19,7 +19,7 @@ The whole app is one HTML file and runs in the browser with no install. Made by 
 - **Voicing.** Inversions, open and drop-2 spacing, octave shift, an added bass note, smooth voice leading, and a voice limit to fit a synth's polyphony (it drops the least important notes first).
 - **Strum.** Spread a chord's notes in milliseconds or as a note length locked to the tempo, upwards, downwards or alternating.
 - **Arpeggiator.** Up, Down, Up-Down, Down-Up, As played and Random, at 1/4 to 1/32 with triplets, over 1–4 octaves, with gate and swing. Latch keeps it running hands-free.
-- **Tempo.** Follows MIDI clock from a port you choose (for example a sequencer), or a tempo you type or tap in. The arpeggiator restarts its pattern when the clock starts.
+- **Tempo.** Follows MIDI clock from a port you choose (for example a sequencer), or a tempo you type or tap in. A MIDI clock switch lets you ignore the clock and use your own tempo. The arpeggiator restarts its pattern when the clock starts.
 - **Velocity.** As played, with a curve and a minimum for keyboards that need hitting hard, or fixed.
 - **Pass-through.** Pressure, pitch bend, CCs and program changes are forwarded, and polyphonic aftertouch is copied to every note of the chord.
 - **Bypass.** Press B to send single notes straight through without changing your routing.
