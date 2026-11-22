@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QuChord — chord generator for QuNexus</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22%3E%3Cdefs%3E%3Cmask id=%22sunmask%22%3E%3Crect width=%22400%22 height=%22400%22 fill=%22%23fff%22/%3E%3Crect y=%22224%22 width=%22400%22 height=%228%22/%3E%3Crect y=%22262%22 width=%22400%22 height=%2213%22/%3E%3Crect y=%22302%22 width=%22400%22 height=%2218%22/%3E%3Crect y=%22344%22 width=%22400%22 height=%2224%22/%3E%3C/mask%3E%3C/defs%3E%3Ccircle cx=%22200%22 cy=%22200%22 r=%22196%22 fill=%22%23FF8A1F%22 mask=%22url%28%23sunmask%29%22/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#111214; --panel:#1a1c1f; --panel2:#212428; --line:#2c3035; --text:#ebe8e4; --muted:#8d9198;
+  --accent:#ff4d3a; --accent-dim:#5a231c; --amber:#f2c14e; --ok:#5fd28a;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 Inter,system-ui,-apple-system,sans-serif}
+header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(17,18,20,.94);backdrop-filter:blur(6px);z-index:5}
+.hwrap{max-width:1280px;margin:0 auto;padding:9px 16px;display:flex;align-items:center;gap:10px}
+button.bypass{font-weight:600;min-width:80px}
+button.bypass[aria-pressed=true]{background:#3b2f10;border-color:var(--amber);color:var(--amber)}
+button.tipsbtn[aria-pressed=true]{color:var(--text);border-color:#454a51}
+button.tipsbtn{color:var(--muted)}
+.tip{font-size:12px;color:#a9adb3;margin:12px 0 0;padding:9px 11px;border-left:2px solid var(--accent-dim);background:#16181b;border-radius:0 6px 6px 0}
+.tip b{color:var(--text);font-weight:600}
+body.notips .tip{display:none}
+.deg{cursor:pointer;font:inherit;color:inherit}
+.deg i{display:block;font:500 9px Inter,sans-serif;font-style:normal;color:var(--muted);margin-top:2px}
+.display.bypassed .chordname{color:var(--amber)}
+footer.credit{max-width:1280px;margin:0 auto;padding:0 16px 8px;color:var(--muted);font-size:11px;letter-spacing:.04em;opacity:.85}
+footer.credit .line{display:flex;align-items:center;justify-content:flex-end;gap:7px;margin:0;line-height:1;flex-wrap:wrap}
+footer.credit .sep{opacity:.5}
+footer.credit .ver{opacity:.6;margin-left:10px}
+footer.credit svg{width:18px;height:18px;flex:none;transform:translateY(-1px)}
+.bypassbar{display:none;max-width:1280px;margin:0 auto;padding:0 16px 10px;cursor:pointer}
+.bypassbar .in{background:var(--amber);color:#1a1405;font-weight:600;font-size:13px;border-radius:8px;padding:7px 12px;display:flex;align-items:center;gap:10px}
+.bypassbar .in span{font-weight:500;opacity:.8}
+.bypassbar .in em{margin-left:auto;font-style:normal;font:700 11px var(--mono);border:1.5px solid #1a1405;border-radius:5px;padding:2px 7px}
+body.bypassed .bypassbar{display:block}
+body.bypassed .bypassbar .in{animation:bpulse 2.4s ease-in-out infinite}
+@keyframes bpulse{50%{background:#ffd978}}
+body.bypassed .logo{background:var(--amber);box-shadow:0 0 12px var(--amber)}
+body.bypassed .card.fx{opacity:.35;filter:grayscale(.7);transition:opacity .2s}
+body.bypassed .card.fx:hover{opacity:.7}
+.brand{display:flex;align-items:baseline;gap:10px;flex:1;min-width:0}
+.logo{width:12px;height:12px;border-radius:3px;background:var(--accent);box-shadow:0 0 12px var(--accent);align-self:center}
+h1{font-size:18px;margin:0;letter-spacing:.02em}
+.sub{color:var(--muted);font-size:12px;white-space:nowrap}
+.status{font:500 11px var(--mono);color:var(--muted);padding:5px 9px;border:1px solid var(--line);border-radius:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40vw}
+.status.ok{color:var(--ok);border-color:#29573a}
+.status.warn{color:var(--amber);border-color:#5c4b22}
+button{font:inherit;color:inherit;background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:7px 11px;cursor:pointer;transition:background .12s,border-color .12s}
+button:hover{border-color:#454a51}
+button.danger{background:#2a1513;border-color:#5a231c;color:#ff8a7c;font-weight:600}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+main{max-width:1280px;margin:0 auto;padding:10px 16px 8px;display:grid;gap:10px;grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-areas:"disp disp disp" "route perf arp" "src src voice" "kb kb kb"}
+.a-disp{grid-area:disp}.a-route{grid-area:route}.a-perf{grid-area:perf}.a-arp{grid-area:arp}.a-src{grid-area:src}.a-voice{grid-area:voice}.a-kb{grid-area:kb}
+@media (max-width:1100px){main{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"disp disp" "route perf" "src src" "voice arp" "kb kb"}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 14px}
+.card h2{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:0 0 9px;font-weight:600}
+.display{display:flex;align-items:center;gap:18px;padding:7px 16px;background:linear-gradient(180deg,#1c1e21,#16171a)}
+.chordname{font:700 32px/1 var(--mono);color:var(--accent);min-width:3.5ch;letter-spacing:-.02em}
+.chordnotes{font:500 13px var(--mono);color:var(--muted)}
+.modehint{margin-left:auto;font-size:12px;color:var(--muted);text-align:right}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:0 0 8px}
+.row:last-child{margin-bottom:0}
+.row>label,.lbl{color:var(--muted);font-size:12px;min-width:66px}
+.sel{display:flex;align-items:center;flex:1;min-width:0;max-width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:0 6px 0 2px}
+.sel:hover{border-color:#454a51}
+.sel select{font:inherit;color:var(--text);background:transparent;border:0;outline:0;padding:7px 4px 7px 7px;flex:1;min-width:0;cursor:pointer}
+.sel select:disabled{cursor:default;color:var(--muted)}
+.sel option{background:var(--panel2);color:var(--text)}
+input[type=number]{font:500 13px var(--mono);color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:6px 8px;width:72px}
+#divSeg button,#arpRateSeg button{padding:5px 7px}#arpPatSeg button{padding:5px 6px}
+.clockinfo{font:500 11px var(--mono);color:var(--muted)}
+.clockinfo.live{color:var(--ok)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
+.seg button{border:0;border-radius:0;background:transparent;padding:5px 9px;color:var(--muted);border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--accent-dim);color:#fff}
+.seg.big{display:flex;width:100%}
+.seg.big button{flex:1;padding:7px 6px;font-weight:600}
+.toggle{display:inline-flex;align-items:center;gap:7px;background:transparent;border:1px solid var(--line);padding:5px 10px 5px 7px;color:var(--muted)}
+.toggle::before{content:"";width:26px;height:14px;border-radius:8px;background:#3a3e44;box-shadow:inset 0 0 0 2px #3a3e44;transition:.15s}
+.toggle[aria-pressed=true]{color:var(--text)}
+.toggle[aria-pressed=true]::before{background:var(--accent);box-shadow:inset 13px 0 0 2px #fff4,inset 0 0 0 2px var(--accent)}
+.grid{display:grid;gap:7px}
+.slots{grid-template-columns:repeat(4,1fr)}
+.types{grid-template-columns:repeat(auto-fill,minmax(72px,1fr))}
+.chip{padding:6px 5px;text-align:center;font:600 13px var(--mono);border-radius:8px;position:relative}
+.chip small{display:block;font:500 10px var(--mono);color:var(--muted);margin-top:2px}
+.chip.on{background:var(--accent-dim);border-color:var(--accent);color:#fff}
+.chip.on small{color:#ffb4aa}
+.chip .num{position:absolute;top:3px;left:6px;font-size:9px;color:var(--muted)}
+.degrees{grid-template-columns:repeat(7,1fr)}
+.deg{padding:5px 2px;text-align:center;border:1px solid var(--line);border-radius:8px;background:var(--panel2)}
+.deg b{display:block;font:600 10px var(--mono);color:var(--muted)}
+.deg span{font:600 12px var(--mono)}
+.deg.on{border-color:var(--accent);background:var(--accent-dim)}
+.hint{font-size:12px;color:var(--muted);margin:10px 0 0}
+.learnbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}
+.learnbar .info{font:500 12px var(--mono);color:var(--amber);flex:1;min-width:150px}
+input[type=range]{flex:1;accent-color:var(--accent);min-width:100px}
+.val{font:500 12px var(--mono);color:var(--text);min-width:52px;text-align:right}
+.hidden{display:none!important}
+.kbwrap{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;overflow-x:auto}
+.kb{position:relative;height:78px;margin:0 auto;user-select:none;-webkit-user-select:none;touch-action:none}
+.wk,.bk{position:absolute;top:0;border-radius:0 0 5px 5px;cursor:pointer}
+.wk{height:78px;background:#e9e6e1;border:1px solid #9a968f}
+.bk{height:48px;background:#1d1e20;border:1px solid #000;z-index:2}
+.wk.in{background:#f6dc93}.bk.in{background:#8a6a1c}
+.wk.out{background:var(--accent);border-color:#a52b1e}.bk.out{background:#c7301f}
+.wk.in.out,.bk.in.out{box-shadow:inset 0 -10px 0 var(--amber)}
+.wk .oct{position:absolute;bottom:4px;width:100%;text-align:center;font:600 9px var(--mono);color:#7c786f}
+@media (max-width:760px){main{grid-template-columns:1fr}.chordname{font-size:34px}.modehint{display:none}.sub{display:none}}
+</style>
+</head>
+<body>
+<header><div class="hwrap">
+  <div class="brand"><span class="logo"></span><h1>QuChord</h1><span class="sub">chord generator · Web MIDI</span></div>
+  <div class="status" id="status">MIDI: starting…</div>
+  <button id="tips" class="tipsbtn" title="Show or hide the explanation notes in each panel">Tips</button>
+  <button id="bypass" class="bypass" aria-pressed="false" title="Bypass (B): pass single notes straight through, no chords. Routing stays as it is.">Bypass</button>
+  <button id="panic" class="danger" title="All notes off (Esc)">Panic</button>
+</div>
+  <div class="bypassbar" id="bypassBar" title="Click or press B to turn Bypass off"><div class="in">BYPASS ON <span>Single notes pass straight through. Chords, strum, voicing and the arpeggiator are off.</span><em>B to turn off</em></div></div>
+</header>
+
+<main>
+  <section class="card display a-disp">
+    <div class="chordname" id="chordName">—</div>
+    <div><div class="chordnotes" id="chordNotes">Play a key</div><div class="chordnotes" id="velInfo" style="font-size:11px;margin-top:4px;opacity:.75" title="Velocity received from the QuNexus and velocity sent out"></div></div>
+    <div class="modehint" id="modeHint"></div>
+  </section>
+
+  <section class="card a-route">
+    <h2>Routing</h2>
+    <div class="row"><label for="inSel">MIDI in</label><span class="sel"><select id="inSel"></select></span></div>
+    <div class="row"><label for="outSel">MIDI out</label><span class="sel"><select id="outSel"></select></span></div>
+    <div class="row"><label for="outCh">Out channel</label><span class="sel"><select id="outCh"></select></span></div>
+    <div class="row"><span class="lbl">Monitor</span><button class="toggle" data-key="preview" title="Hear QuChord's output in the browser, as well as sending it out">Preview sound</button></div>
+    <p class="tip">Send QuChord's output to the Cirklon and switch off any direct QuNexus → Cirklon route, or you'll hear the single note as well as the chord. Run the QuNexus with MPE off.</p>
+  </section>
+
+  <section class="card fx a-perf">
+    <h2>Performance</h2>
+    <div class="row"><span class="lbl">Strum</span><div class="seg" id="strumModeSeg" data-key="strumMode"><button data-v="ms" title="Strum gap set in milliseconds">Time</button><button data-v="sync" title="Strum gap locked to the tempo as a note division">Tempo sync</button></div><span class="val" id="strumVal"></span></div>
+    <div class="row" id="strumMsRow"><span class="lbl">Gap</span><input type="range" id="strum" min="0" max="150" step="1" title="Gap between each note of the chord"></div>
+    <div class="row" id="strumDivRow"><span class="lbl">Gap</span><div class="seg" id="divSeg" data-key="strumDiv" title="Gap between each note of the chord, as a note length at the current tempo"><button data-v="off">Off</button><button data-v="1/64">1/64</button><button data-v="1/32">1/32</button><button data-v="1/16T">1/16T</button><button data-v="1/16">1/16</button><button data-v="1/8T">1/8T</button><button data-v="1/8">1/8</button><button data-v="1/4">1/4</button></div></div>
+    <div class="row" id="tempoRow"><span class="lbl">Tempo</span><input type="number" id="bpm" min="30" max="300" step="0.1" title="Manual tempo, used when no MIDI clock is coming in"><button id="tap" title="Tap four or more times to set the tempo">Tap</button>
+      <span class="sel" style="max-width:220px" title="Follow MIDI clock from this port (e.g. the Cirklon). Falls back to the manual tempo when no clock arrives."><select id="clockSel"></select></span><span class="clockinfo" id="clockInfo"></span></div>
+    <div class="row"><span class="lbl">Direction</span><div class="seg" id="dirSeg" data-key="strumDir"><button data-v="up">Up</button><button data-v="down">Down</button><button data-v="alt">Alternate</button></div></div>
+    <div class="row"><span class="lbl">Velocity</span><div class="seg" id="velSeg" data-key="velMode"><button data-v="played">As played</button><button data-v="fixed">Fixed</button></div></div>
+    <div class="row" id="velCurveRow"><span class="lbl">Curve</span><div class="seg" id="curveSeg" data-key="velCurve"><button data-v="softer" title="Much louder for light hits">Softer</button><button data-v="soft" title="Louder for light hits">Soft</button><button data-v="linear" title="As the pads send it">Linear</button><button data-v="hard" title="Need to hit harder for loud notes">Hard</button></div></div>
+    <div class="row" id="velMinRow"><span class="lbl">Minimum</span><input type="range" id="velMin" min="1" max="110" title="Lowest velocity sent, however lightly you hit"><span class="val" id="velMinVal"></span></div>
+    <div class="row" id="velFixedRow"><span class="lbl">Fixed vel.</span><input type="range" id="velFixed" min="1" max="127"><span class="val" id="velFixedVal"></span></div>
+    <div class="row">
+      <button class="toggle" data-key="latch" title="Chord keeps sounding until the next one">Latch</button>
+      <button class="toggle" data-key="pass" title="Forward CC, pitch bend, pressure and program change">Pass CC / bend</button>
+    </div>
+    <p class="tip"><b>Strum</b> spreads the chord's notes out in time like a strummed guitar: 15–40 ms is subtle, 80 ms+ is a harp-like roll. <b>Tempo sync</b> sets the gap as a note length instead, so a 1/16 strum on a 4-note chord rolls out over one beat in time with the track. Pick the Cirklon as the clock port to follow its tempo, or type a tempo or tap it in. <b>Latch</b> keeps the chord sounding after you let go, until you play the next one. It's handy for holding a pad while you tweak the synth. <b>Velocity</b>: if the pads need hitting hard, use <b>As played</b> with the <b>Soft</b> or <b>Softer</b> curve and raise <b>Minimum</b>. The readout under the chord name shows what comes in and what goes out. <b>Pass CC / bend</b> forwards the QuNexus's pressure, tilt and bend messages so modulation still works.</p>
+  </section>
+
+  <section class="card fx a-src">
+    <h2>Chord source</h2>
+    <div class="seg big" id="modeSeg" data-key="mode" style="margin-bottom:10px">
+      <button data-v="memory">Chord memory</button><button data-v="type">Chord type</button><button data-v="scale">Scale chords</button><button data-v="single">Single notes</button>
+    </div>
+
+    <div id="panel-memory">
+      <div class="grid slots" id="slots"></div>
+      <div class="learnbar">
+        <button class="primary" id="learnBtn">Learn into slot</button>
+        <span class="info" id="learnInfo">Number keys 1–8 select a slot.</span>
+        <button id="learnSave" class="hidden">Save</button>
+        <button id="learnCancel" class="hidden">Cancel</button>
+      </div>
+      <p class="tip"><b>Chord memory</b> stores a chord's <i>shape</i> (the gaps between its notes), not its actual pitches. Learn C–E–G and every key plays a major triad built on itself. The small numbers under each slot are those gaps in semitones: 0·4·7 is a major triad, and 0·3·7 is minor.</p>
+    </div>
+
+    <div id="panel-type" class="hidden">
+      <div class="grid types" id="types"></div>
+      <p class="tip">Every key plays the chosen chord, with the key you press as its <b>root</b> (the note the chord is named after). Hover a chord for a description. Moving a single chord shape around like this is the classic house, techno and dub technique, and it sounds great on a Prophet.</p>
+    </div>
+
+    <div id="panel-single" class="hidden">
+      <p class="tip" style="margin-top:0">No chords: each key plays just its own note, with the Octave setting from Voicing applied. Use it with the <b>Arpeggiator</b> for basslines and sequences. Unlike Bypass, the arpeggiator, octave shift and velocity settings still work.</p>
+    </div>
+
+    <div id="panel-scale" class="hidden">
+      <div class="row"><label for="key">Key</label><span class="sel" style="max-width:110px"><select id="key"></select></span>
+        <span class="sel" style="max-width:240px"><select id="scale"></select></span></div>
+      <div class="row"><span class="lbl">Chord size</span><div class="seg" id="sizeSeg" data-key="size"><button data-v="3">Triads</button><button data-v="4">7ths</button><button data-v="5">9ths</button></div></div>
+      <div class="row"><span class="lbl">Off-scale keys</span><div class="seg" id="oosSeg" data-key="oos"><button data-v="snap">Snap to scale</button><button data-v="single">Single note</button><button data-v="mute">Mute</button></div></div>
+      <div class="grid degrees" id="degrees"></div>
+      <p class="tip">Every key plays a chord built only from notes in the chosen key, so everything you play fits together. The <b>roman numerals</b> give each chord's position in the key: I is built on the 1st note of the scale, V on the 5th, and so on. <b>Uppercase</b> means major, <b>lowercase</b> means minor, <b>°</b> means diminished and <b>ø</b> means half-diminished. Because the numbers stay the same in any key, songs get described this way. Try I–V–vi–IV (countless pop songs), ii–V–I (jazz), or i–VI–III–VII in a minor key. <b>Tap a chord above to hear it.</b></p>
+    </div>
+  </section>
+
+  <section class="card fx a-voice">
+    <h2>Voicing</h2>
+    <div class="row"><span class="lbl">Inversion</span><div class="seg" id="invSeg" data-key="inversion"><button data-v="0">Root</button><button data-v="1">1st</button><button data-v="2">2nd</button><button data-v="3">3rd</button></div></div>
+    <div class="row"><span class="lbl">Spread</span><div class="seg" id="spreadSeg" data-key="spread"><button data-v="close">Close</button><button data-v="open">Open</button><button data-v="drop2">Drop 2</button></div></div>
+    <div class="row"><span class="lbl">Octave</span><div class="seg" id="octSeg" data-key="octave"><button data-v="-2">−2</button><button data-v="-1">−1</button><button data-v="0">0</button><button data-v="1">+1</button><button data-v="2">+2</button></div></div>
+    <div class="row"><button class="toggle" data-key="smooth" title="Picks the inversion closest to the previous chord">Smooth voice leading</button>
+      <button class="toggle" data-key="bass" title="Adds the root an octave below">Bass note</button></div>
+    <div class="row"><label for="voices" title="Maximum notes sounding at once. Match it to your synth's polyphony.">Voice limit</label>
+      <span class="sel" style="max-width:150px"><select id="voices" title="Maximum notes sounding at once. Match it to your synth's polyphony."></select></span></div>
+    <p class="tip"><b>Inversion</b> changes which chord note is at the bottom: same chord, different colour. <b>Open</b> spacing spreads the notes over a wider range for a bigger, lusher sound, and <b>Drop 2</b> is a classic jazz piano voicing. <b>Smooth voice leading</b> picks whichever inversion is closest to the previous chord, so changes glide instead of jumping around. <b>Voice limit</b> trims big chords to fit your synth's polyphony, dropping the least important notes first (doubled notes, then the 5th, then extensions) while keeping the root, the 3rd and the 7th, which give a chord its character. When a new chord would go over the limit, it also releases the older chord.</p>
+  </section>
+
+  <section class="card fx a-arp">
+    <h2>Arpeggiator</h2>
+    <div class="row"><button class="toggle" data-key="arpOn" title="Arpeggiator on/off (A)">Arpeggiator on</button></div>
+    <div class="row"><span class="lbl">Pattern</span><div class="seg" id="arpPatSeg" data-key="arpPattern">
+        <button data-v="up" title="Lowest to highest">Up</button><button data-v="down" title="Highest to lowest">Down</button><button data-v="updown" title="Up then back down">Up-Dn</button><button data-v="downup" title="Down then back up">Dn-Up</button><button data-v="played" title="In the order you pressed the keys">Played</button><button data-v="random" title="Random note each step">Rand</button></div></div>
+    <div class="row"><span class="lbl">Rate</span><div class="seg" id="arpRateSeg" data-key="arpRate"><button data-v="1/4">1/4</button><button data-v="1/8">1/8</button><button data-v="1/8T">1/8T</button><button data-v="1/16">1/16</button><button data-v="1/16T">1/16T</button><button data-v="1/32">1/32</button></div></div>
+    <div class="row"><span class="lbl">Octaves</span><div class="seg" id="arpOctSeg" data-key="arpOct" title="How many octaves the pattern climbs through"><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button></div></div>
+    <div class="row"><span class="lbl">Gate</span><input type="range" id="arpGate" min="10" max="100" title="How long each note lasts as a share of the step: short = staccato, 100% = legato"><span class="val" id="arpGateVal"></span></div>
+    <div class="row"><span class="lbl">Swing</span><input type="range" id="arpSwing" min="50" max="75" title="50% = straight; 66% = triplet shuffle; 75% = hard swing"><span class="val" id="arpSwingVal"></span></div>
+    <p class="tip">The arpeggiator plays whatever QuChord would play (the chord's notes, or the keys you hold in <b>Single notes</b> mode) one at a time, in time with the tempo. For a bassline: choose <b>Single notes</b>, hold one key, set Octaves to 2 and try <b>Up</b> at 1/16. Hold two or three keys to make a pattern from them, and turn on <b>Latch</b> to keep it running hands-free. With a clock port selected in Performance, it locks to the Cirklon's MIDI clock, starts new notes on the next step and restarts its pattern when the Cirklon starts. Without one, it uses the manual tempo there. <b>Gate</b> sets note length, and <b>Swing</b> delays every second step for shuffle.</p>
+  </section>
+
+  <section class="kbwrap a-kb"><div class="kb" id="kb"></div></section>
+</main>
+<footer class="credit"><p class="line"><span>QuChord: made by OPT</span><span class="sep">·</span><span>Unofficial community tool, not affiliated with or endorsed by Muse Kinetics.</span><span class="ver" title="Build 11">v1.0</span><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></p></footer>
+
+<script>
+"use strict";
+// ---------- music data ----------
+const NN = ['C','C#','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
+const noteName = n => NN[n%12] + (Math.floor(n/12)-1);
+
+const TYPES = [
+  ['maj',[0,4,7]],['min',[0,3,7]],['7',[0,4,7,10]],['maj7',[0,4,7,11]],['m7',[0,3,7,10]],
+  ['6',[0,4,7,9]],['m6',[0,3,7,9]],['sus2',[0,2,7]],['sus4',[0,5,7]],['7sus4',[0,5,7,10]],
+  ['dim',[0,3,6]],['dim7',[0,3,6,9]],['m7b5',[0,3,6,10]],['aug',[0,4,8]],['add9',[0,4,7,14]],
+  ['madd9',[0,3,7,14]],['9',[0,4,7,10,14]],['maj9',[0,4,7,11,14]],['m9',[0,3,7,10,14]],
+  ['11',[0,7,10,14,17]],['m11',[0,3,7,10,14,17]],['6/9',[0,4,9,14]],['5',[0,7]],['5+8',[0,7,12]],['quartal',[0,5,10,15]]
+];
+const SCALES = {
+  'Major (Ionian)':[0,2,4,5,7,9,11], 'Natural minor (Aeolian)':[0,2,3,5,7,8,10], 'Dorian':[0,2,3,5,7,9,10],
+  'Phrygian':[0,1,3,5,7,8,10], 'Lydian':[0,2,4,6,7,9,11], 'Mixolydian':[0,2,4,5,7,9,10],
+  'Locrian':[0,1,3,5,6,8,10], 'Harmonic minor':[0,2,3,5,7,8,11], 'Melodic minor':[0,2,3,5,7,9,11]
+};
+const ROMAN = ['I','II','III','IV','V','VI','VII'];
+const FUNCS = ['Tonic','Supertonic','Mediant','Subdominant','Dominant','Submediant','Leading tone'];
+const FUNC_DESC = ['home: where progressions resolve','often leads to V','gentle, links I and V','moves away from home','strongest pull back to I','relative minor/major of I: bittersweet','tense, wants to resolve to I'];
+const TYPE_DESC = {
+  maj:'Major triad: bright and stable', min:'Minor triad: darker, more emotional', '7':'Dominant 7th: bluesy tension that wants to resolve',
+  maj7:'Major 7th: dreamy, soulful, lush', m7:'Minor 7th: smooth and mellow, a house/soul staple', '6':'Major 6th: sweet, retro',
+  m6:'Minor 6th: mysterious, film-noir', sus2:'Suspended 2nd: open and airy, neither major nor minor', sus4:'Suspended 4th: unresolved and hopeful',
+  '7sus4':'7sus4: open, modern tension', dim:'Diminished: tense and unstable', dim7:'Diminished 7th: very tense, horror-film drama',
+  m7b5:'Half-diminished: dark, jazzy', aug:'Augmented: dreamlike and unsettled', add9:'Add 9: a major chord with sparkle',
+  madd9:'Minor add 9: wistful, a classic pad chord', '9':'Dominant 9th: funky', maj9:'Major 9th: rich, neo-soul',
+  m9:'Minor 9th: deep house and Detroit techno pads', '11':'11th: wide and open, fusion', m11:'Minor 11th: huge and spacious (6 notes)',
+  '6/9':'6/9: warm and resolved, jazz endings', '5':'Power chord: root and 5th, no 3rd', '5+8':'Power chord plus octave',
+  quartal:'Stacked 4ths: modern, ambient, McCoy Tyner'
+};
+const NAMES = {
+  '0,4,7':'', '0,3,7':'m', '0,3,6':'dim', '0,4,8':'aug', '0,2,7':'sus2', '0,5,7':'sus4', '0,7':'5',
+  '0,4,7,9':'6', '0,3,7,9':'m6', '0,4,7,10':'7', '0,4,7,11':'maj7', '0,3,7,10':'m7', '0,3,7,11':'m(maj7)',
+  '0,3,6,10':'m7b5', '0,3,6,9':'dim7', '0,5,7,10':'7sus4', '0,2,4,7':'add9', '0,2,3,7':'m(add9)',
+  '0,2,4,7,10':'9', '0,2,4,7,11':'maj9', '0,2,3,7,10':'m9', '0,2,4,9':'6/9', '0,2,4,7,9':'6/9',
+  '0,4,10':'7', '0,4,11':'maj7', '0,3,10':'m7', '0,4,6,10':'7b5', '0,4,8,10':'7#5', '0,4,8,11':'maj7#5',
+  '0,1,4,7,10':'7b9', '0,3,4,7,10':'7#9', '0,1,3,7,10':'m7b9', '0,1,3,6,10':'m7b5b9', '0,2,5,7,10':'11',
+  '0,2,3,5,7,10':'m11', '0,2,3,7,11':'m(maj9)', '0,2,4,8,11':'maj9#5', '0,2,4,6,11':'maj9#11', '0,1,4,7,11':'maj7b9',
+  '0,2,3,6,10':'m9b5', '0,2,3,6,9':'dim9', '0,3,5,10':'m11',
+  '0,2,3,5,10':'m11', '0,2,3,10':'m9', '0,2,4,10':'9', '0,2,4,11':'maj9', '0,5,10':'7sus4', '0,2,5,10':'11', '0,1,3,10':'m7b9', '0,1,4,10':'7b9', '0,2,4,9,11':'maj13', '0,2,3,9,10':'m13'
+};
+function chordName(notes){
+  if(!notes.length) return '—';
+  const pcs=[...new Set(notes.map(n=>n%12))];
+  const low=Math.min(...notes)%12;
+  if(pcs.length===1) return NN[low];
+  for(const r of [low,...pcs.filter(p=>p!==low)]){
+    const rel=pcs.map(p=>(p-r+12)%12).sort((a,b)=>a-b).join(',');
+    if(rel in NAMES) return NN[r]+NAMES[rel]+(r!==low?'/'+NN[low]:'');
+  }
+  return pcs.map(p=>NN[p]).join(' ');
+}
+function quality(iv){
+  const rel=[...new Set(iv.map(i=>((i%12)+12)%12))].sort((a,b)=>a-b).join(',');
+  if(rel in NAMES) return NAMES[rel]||'maj';
+  return chordName(iv.map(i=>60+i));
+}
+
+// ---------- state ----------
+const DEFAULTS = {
+  inName:'', outName:'', outCh:0, mode:'memory', activeSlot:0,
+  slots:[[0,4,7],[0,3,7],[0,4,7,11],[0,3,7,10],[0,4,7,10],[0,5,7],[0,7,14],[0,3,7,10,14]],
+  type:'maj', key:0, scale:'Major (Ionian)', size:3, oos:'snap',
+  inversion:0, spread:'close', octave:0, smooth:false, bass:false,
+  strum:0, strumDir:'up', velMode:'played', velFixed:100, latch:false, pass:true, preview:false,
+  voices:0, bypass:false, tips:false, layoutV:2,
+  strumMode:'ms', strumDiv:'1/16', bpm:120, clockName:'',
+  arpOn:false, arpPattern:'up', arpRate:'1/16', arpOct:1, arpGate:60, arpSwing:50, velCurve:'linear', velMin:1
+};
+let S = structuredClone(DEFAULTS);
+try{ const s=JSON.parse(localStorage.getItem('quchord.v1')||'null'); if(s){ if(!s.layoutV){ s.tips=false; s.layoutV=2; } delete s.arpVel; S=Object.assign(S,s); } }catch(e){}
+const save=()=>{ try{ localStorage.setItem('quchord.v1',JSON.stringify(S)); }catch(e){} };
+
+// ---------- chord engine ----------
+let lastVoicing=null, altFlip=false, lastDegree=-1;
+const invert=(c,k)=>{ const a=[...c]; for(let i=0;i<k;i++) a.push(a.shift()+12); return a; };
+
+function baseChord(note){ // returns {notes, root} or null
+  if(S.mode==='single') return {notes:[note], root:note, single:true};
+  if(S.mode==='memory') return {notes:S.slots[S.activeSlot].map(i=>note+i), root:note};
+  if(S.mode==='type'){ const t=TYPES.find(t=>t[0]===S.type)||TYPES[0]; return {notes:t[1].map(i=>note+i), root:note}; }
+  const sc=SCALES[S.scale]; let n=note, pc=((n-S.key)%12+12)%12, idx=sc.indexOf(pc);
+  if(idx<0){
+    if(S.oos==='mute') return null;
+    if(S.oos==='single') return {notes:[note], root:note, single:true};
+    n--; pc=((n-S.key)%12+12)%12; idx=sc.indexOf(pc); // all 7-note scales: one semitone down is in scale
+    if(idx<0){ n+=2; pc=((n-S.key)%12+12)%12; idx=sc.indexOf(pc); }
+  }
+  lastDegree=idx;
+  const base=n-sc[idx], out=[];
+  for(let k=0;k<S.size;k++){ const d=idx+2*k; out.push(base+sc[d%7]+12*Math.floor(d/7)); }
+  return {notes:out, root:n};
+}
+function score(c,last,anchor){
+  let s=0;
+  for(const x of c) s+=Math.min(...last.map(l=>Math.abs(l-x)));
+  for(const l of last) s+=Math.min(...c.map(x=>Math.abs(l-x)));
+  const mean=c.reduce((a,b)=>a+b,0)/c.length;
+  s+=0.25*Math.abs(mean-anchor);
+  if(c.some(x=>x<0||x>127)) s+=1000;
+  return s;
+}
+function buildChord(note){
+  const b=baseChord(note); if(!b) return null;
+  if(b.single) return S.mode==='single' ? [Math.min(127,Math.max(0,note+12*S.octave))] : [note];
+  const close=[...b.notes].sort((x,y)=>x-y), n=close.length, o=12*S.octave;
+  let v;
+  if(S.smooth && lastVoicing){
+    let best=null,bs=1e9; const anchor=b.root+o+6;
+    for(let k=0;k<n;k++){ const inv=invert(close,k); for(let sh=-2;sh<=2;sh++){ const c=inv.map(x=>x+12*sh+o); const sc=score(c,lastVoicing,anchor); if(sc<bs){bs=sc;best=c;} } }
+    v=best;
+  } else v=invert(close,Math.min(S.inversion,n-1)).map(x=>x+o);
+  lastVoicing=[...v];
+  if(S.spread==='open' && v.length>=3) v=v.map((x,i)=>i%2===1?x+12:x);
+  else if(S.spread==='drop2' && v.length>=3){ v.sort((a,b)=>a-b); v[v.length-2]-=12; }
+  if(S.bass){ let r=b.root+o-12; while(r>=Math.min(...v)) r-=12; v.push(r); }
+  let res=[...new Set(v)].filter(x=>x>=0&&x<=127).sort((a,b)=>a-b);
+  if(S.voices>0 && res.length>S.voices) res=limitVoices(res,b.root);
+  return res;
+}
+// keep the notes that define the chord: root, 3rd, 7th/6th, then extensions, then the 5th; doubled notes go first
+function limitVoices(notes,root){
+  const rels=notes.map(n=>((n-root)%12+12)%12), hasThird=rels.some(r=>r===3||r===4), seen=new Set();
+  const ranked=notes.map((n,i)=>{
+    const r=rels[i]; let p;
+    if(seen.has(r)) p=9; else {
+      seen.add(r);
+      p = r===0?1 : (r===3||r===4)?2 : (r===10||r===11||r===9)?3 : (r===6||r===8)?3
+        : ((r===2||r===5)&&!hasThird)?2 : r===7?6 : 5;
+    }
+    return {n,p,i};
+  }).sort((a,b)=>a.p-b.p||a.i-b.i);
+  return ranked.slice(0,S.voices).map(x=>x.n).sort((a,b)=>a-b);
+}
+
+// ---------- tempo ----------
+const DIVS={'off':0,'1/64':1/16,'1/32':1/8,'1/16T':1/6,'1/16':1/4,'1/8T':1/3,'1/8':1/2,'1/4':1};
+let clockInput=null, clockTicks=[], lastClock=0, clockBpm=0, clockTick=0;
+const clockLive=()=>{ const d=performance.now()-lastClock; return d>=0 && d<1000 && clockBpm>20 && clockBpm<400; };
+const tempo=()=>clockLive()?clockBpm:S.bpm;
+const strumMs=()=>S.strumMode==='sync' ? (60000/tempo())*DIVS[S.strumDiv] : S.strum;
+function onClock(ev){
+  const st=ev.data[0];
+  if(st===0xFA){ clockTick=0; arpIdx=0; arpStep=0; return; }
+  if(st!==0xF8) return;
+  const t=performance.now(); // don't trust ev.timeStamp: its time base differs between browsers/OSes
+  if(lastClock && t-lastClock<500){ clockTicks.push(t-lastClock); if(clockTicks.length>48) clockTicks.shift(); }
+  else clockTicks=[];
+  lastClock=t;
+  if(clockTicks.length>=12){ const avg=clockTicks.reduce((a,b)=>a+b,0)/clockTicks.length; clockBpm=60000/(avg*24); }
+  // arpeggiator locked to clock ticks (24 per quarter note)
+  if(S.arpOn && !S.bypass && clockLive()){
+    const tps=Math.round(24*DIVS[S.arpRate]);
+    if(clockTick%tps===0){
+      if(arpPool().length){
+        const stepMs=tps*60000/(clockBpm*24), sw=(S.arpSwing-50)/50, odd=arpStep%2===1;
+        playStep(t+(odd?sw*stepMs:0), stepMs*(odd?1-sw:1+sw)); arpStep++;
+      } else { arpIdx=0; arpStep=0; }
+    }
+  }
+  clockTick++;
+}
+function selectClock(p){
+  if(clockInput) clockInput.removeEventListener('midimessage',onClock);
+  clockInput=p||null; clockTicks=[]; lastClock=0; clockBpm=0;
+  if(clockInput) clockInput.addEventListener('midimessage',onClock);
+}
+let taps=[];
+function tap(){
+  const t=performance.now(); taps=taps.filter(x=>t-x<2500); taps.push(t);
+  if(taps.length>=3){ const iv=(taps[taps.length-1]-taps[0])/(taps.length-1); S.bpm=Math.round(600000/iv)/10; save(); renderAll(); }
+}
+setInterval(()=>{
+  const el=$('clockInfo'); if(!el) return;
+  if(clockInput){ el.textContent=clockLive()?clockBpm.toFixed(1)+' BPM':'no clock'; el.className='clockinfo'+(clockLive()?' live':''); }
+  else { el.textContent=''; el.className='clockinfo'; }
+  if(S.strumMode==='sync') $('strumVal').textContent=strumLabel();
+},250);
+const strumLabel=()=>{ const ms=strumMs(); return ms? Math.round(ms)+' ms':'off'; };
+
+// ---------- arpeggiator ----------
+let arpIdx=0, arpStep=0, arpNext=0; const arpTimers=new Set();
+function arpPool(){
+  const base=[], seen=new Set();
+  for(const e of active.values()) if(e.arp) for(const n of e.notes) if(!seen.has(n)){ seen.add(n); base.push({n,ch:e.ch,v:e.v}); }
+  return base;
+}
+function arpSeq(){
+  const base=arpPool(); if(!base.length) return [];
+  const ord=S.arpPattern==='played'?base:[...base].sort((a,b)=>a.n-b.n), ex=[];
+  for(let o=0;o<S.arpOct;o++) for(const x of ord){ const n=x.n+12*o; if(n<=127) ex.push({...x,n}); }
+  if(S.arpPattern==='down') return ex.reverse();
+  if(S.arpPattern==='updown') return ex.length>2?[...ex,...ex.slice(1,-1).reverse()]:ex;
+  if(S.arpPattern==='downup'){ const d=[...ex].reverse(); return d.length>2?[...d,...d.slice(1,-1).reverse()]:d; }
+  return ex;
+}
+function playStep(t,stepMs){
+  const seq=arpSeq(); if(!seq.length) return;
+  const pn=performance.now(); if(!(t>=pn-50 && t<=pn+1000)) t=pn;
+  if(!(stepMs>0 && stepMs<10000)) stepMs=125;
+  const it = S.arpPattern==='random' ? seq[Math.floor(Math.random()*seq.length)] : seq[arpIdx%seq.length];
+  arpIdx++;
+  const gate=Math.max(5,Math.min(stepMs*S.arpGate/100, stepMs-2)), k=(it.ch-1)*128+it.n, now=performance.now();
+  outCount.set(k,(outCount.get(k)||0)+1);
+  send([0x90|(it.ch-1),it.n,it.v],t);
+  send([0x80|(it.ch-1),it.n,0],t+gate);
+  const tOn=setTimeout(()=>{ arpTimers.delete(tOn); renderKb(); },Math.max(0,t-now));
+  const tOff=setTimeout(()=>{ arpTimers.delete(tOff); const c=(outCount.get(k)||0)-1; c<=0?outCount.delete(k):outCount.set(k,c); renderKb(); },Math.max(0,t+gate-now));
+  arpTimers.add(tOn); arpTimers.add(tOff);
+}
+function arpTick(){
+  if(!S.arpOn || S.bypass || clockLive()){ arpNext=0; return; }
+  if(!arpPool().length){ arpNext=0; arpIdx=0; arpStep=0; return; }
+  const now=performance.now(); if(!arpNext || arpNext<now-50) arpNext=now;
+  while(arpNext<now+30){
+    const step=60000/tempo()*DIVS[S.arpRate], sw=(S.arpSwing-50)/50, dur=step*(arpStep%2===0?1+sw:1-sw);
+    playStep(arpNext,dur); arpNext+=dur; arpStep++;
+  }
+}
+setInterval(arpTick,5);
+
+// ---------- velocity ----------
+const CURVES={linear:1, soft:0.6, softer:0.4, hard:1.6};
+function mapVel(v){
+  const y=Math.pow(v/127, CURVES[S.velCurve]||1);
+  return Math.max(1,Math.min(127,Math.round(S.velMin+(127-S.velMin)*y)));
+}
+function showVel(inV,outV){ const el=$('velInfo'); if(el) el.textContent=`vel in ${inV} → out ${outV}`; }
+
+// ---------- MIDI out + note tracking ----------
+let access=null, input=null, output=null;
+const active=new Map();    // inCh*128+note -> {notes, ch, times, latched}
+const outCount=new Map();  // ch*128+note -> count
+const inHeld=new Set();
+
+function send(bytes,t){
+  const now=performance.now();
+  if(t && (t>now+2000 || t<now-2000)) t=now; // never schedule far ahead/behind
+  if(output){ try{ (t && t>now+1) ? output.send(bytes,t) : output.send(bytes); }catch(e){} }
+  if(S.preview) synthMsg(bytes,t);
+}
+const outChFor=inCh=>S.outCh>0?S.outCh:inCh;
+
+function noteOn(inCh,note,vel){
+  inHeld.add(note);
+  if(learning){ learnSet.add(note); learnHeld.add(note); send([0x90|(outChFor(inCh)-1),note,vel]); renderLearn(); renderKb(); return; }
+  if(S.latch){ for(const [k,e] of active) if(e.latched){ release(e); active.delete(k); } }
+  const key=inCh*128+note;
+  if(active.has(key)){ release(active.get(key)); active.delete(key); }
+  const chord=S.bypass?[note]:buildChord(note);
+  if(!chord||!chord.length){ renderKb(); return; }
+  if(S.arpOn && !S.bypass){
+    active.set(key,{notes:chord,ch:outChFor(inCh),times:{},latched:false,arp:true,v:S.velMode==='fixed'?S.velFixed:mapVel(vel)});
+    showVel(vel,active.get(key).v); showChord(chord); arpTick(); renderKb(); return;
+  }
+  if(S.voices>0){ // free voices: release oldest chords first
+    for(const [k,e] of active){ if(outCount.size+chord.length<=S.voices) break; release(e); active.delete(k); }
+  }
+  const ch=outChFor(inCh), v=S.bypass?vel:(S.velMode==='fixed'?S.velFixed:mapVel(vel));
+  showVel(vel,v);
+  let order=[...chord];
+  const down = S.strumDir==='down' || (S.strumDir==='alt' && (altFlip=!altFlip));
+  if(down) order.reverse();
+  const t0=performance.now(), times={}, gap=strumMs();
+  order.forEach((n,i)=>{
+    const t=t0+(S.bypass?0:i*gap); times[n]=t;
+    const k=(ch-1)*128+n; outCount.set(k,(outCount.get(k)||0)+1);
+    send([0x90|(ch-1),n,v],t);
+  });
+  active.set(key,{notes:chord,ch,times,latched:false});
+  showChord(chord);
+  renderKb();
+}
+function release(e){
+  if(e.arp) return;
+  const now=performance.now();
+  for(const n of e.notes){
+    const k=(e.ch-1)*128+n, c=(outCount.get(k)||0)-1;
+    if(c<=0){ outCount.delete(k); send([0x80|(e.ch-1),n,0],Math.max(now,(e.times[n]||0)+2)); }
+    else outCount.set(k,c);
+  }
+}
+function noteOff(inCh,note){
+  inHeld.delete(note);
+  if(learning){
+    send([0x80|(outChFor(inCh)-1),note,0]); learnHeld.delete(note);
+    if(learnHeld.size===0 && learnFromMidi && learnSet.size) commitLearn();
+    renderKb(); return;
+  }
+  const key=inCh*128+note, e=active.get(key);
+  if(e){ if(S.latch) e.latched=true; else { release(e); active.delete(key); } }
+  renderKb();
+}
+function releaseAll(){ for(const e of active.values()) release(e); active.clear(); renderKb(); }
+function panic(){
+  releaseAll();
+  for(const k of outCount.keys()) send([0x80|Math.floor(k/128),k%128,0]);
+  outCount.clear();
+  for(let c=0;c<16;c++){ send([0xB0|c,64,0]); send([0xB0|c,123,0]); send([0xB0|c,120,0]); }
+  for(const to of arpTimers) clearTimeout(to); arpTimers.clear(); arpIdx=0; arpStep=0; arpNext=0;
+  setTimeout(()=>{ for(let c=0;c<16;c++) send([0xB0|c,123,0]); synthAllOff(); },60);
+  synthAllOff(); inHeld.clear(); renderKb();
+}
+
+function onMidi(ev){
+  const d=ev.data, s=d[0]; if(s>=0xF0) return;
+  const type=s&0xF0, ch=(s&0x0F)+1;
+  if(type===0x90 && d[2]>0) return noteOn(ch,d[1],d[2]);
+  if(type===0x80 || type===0x90) return noteOff(ch,d[1]);
+  if(type===0xA0){ const e=active.get(ch*128+d[1]); if(e) for(const n of e.notes) send([0xA0|(e.ch-1),n,d[2]]); return; }
+  if(S.pass && (type===0xB0||type===0xD0||type===0xE0||type===0xC0)){
+    const o=outChFor(ch)-1; send(type===0xC0||type===0xD0?[type|o,d[1]]:[type|o,d[1],d[2]]);
+  }
+}
+
+// ---------- learn ----------
+let learning=false, learnFromMidi=true; const learnSet=new Set(), learnHeld=new Set();
+function startLearn(){ learning=true; learnSet.clear(); learnHeld.clear(); releaseAll(); renderLearn(); }
+function stopLearn(){ learning=false; learnSet.clear(); learnHeld.clear(); renderLearn(); renderKb(); }
+function commitLearn(){
+  const ns=[...learnSet].sort((a,b)=>a-b);
+  if(ns.length){ S.slots[S.activeSlot]=ns.map(n=>n-ns[0]); save(); }
+  stopLearn(); renderSlots();
+}
+function renderLearn(){
+  $('learnBtn').classList.toggle('hidden',learning);
+  $('learnSave').classList.toggle('hidden',!learning);
+  $('learnCancel').classList.toggle('hidden',!learning);
+  $('learnInfo').textContent = learning
+    ? (learnSet.size ? 'Got: '+[...learnSet].sort((a,b)=>a-b).map(noteName).join(' ')+'  ('+chordName([...learnSet])+')' : `Slot ${S.activeSlot+1}: hold a chord on the QuNexus and let go — or tap keys below, then Save`)
+    : 'Number keys 1–8 select a slot.';
+}
+
+// ---------- preview synth ----------
+let actx=null, master=null; const voices=new Map();
+function ensureAudio(){
+  if(actx) { actx.resume(); return; }
+  try{
+    actx=new (window.AudioContext||window.webkitAudioContext)();
+    const comp=actx.createDynamicsCompressor(); master=actx.createGain(); master.gain.value=0.5;
+    master.connect(comp).connect(actx.destination);
+  }catch(e){ actx=null; }
+}
+function synthMsg(b,t){
+  if(!actx) return;
+  const ty=b[0]&0xF0, when=actx.currentTime+Math.max(0,((t||performance.now())-performance.now())/1000);
+  if(ty===0x90 && b[2]>0){
+    const o=actx.createOscillator(), f=actx.createBiquadFilter(), g=actx.createGain(), a=0.14*b[2]/127;
+    o.type='sawtooth'; o.frequency.value=440*2**((b[1]-69)/12);
+    f.type='lowpass'; f.frequency.value=2200; f.Q.value=0.7;
+    g.gain.setValueAtTime(0,when); g.gain.linearRampToValueAtTime(a,when+0.008); g.gain.setTargetAtTime(a*0.6,when+0.01,0.4);
+    o.connect(f).connect(g).connect(master); o.start(when);
+    if(!voices.has(b[1])) voices.set(b[1],[]); voices.get(b[1]).push({o,g});
+  } else if(ty===0x80 || ty===0x90){
+    const v=voices.get(b[1]); if(!v||!v.length) return; const {o,g}=v.shift();
+    g.gain.cancelScheduledValues(when); g.gain.setTargetAtTime(0,when,0.07); o.stop(when+0.6);
+  }
+}
+function synthAllOff(){ for(const v of voices.values()) for(const {o,g} of v){ try{ g.gain.setTargetAtTime(0,actx.currentTime,0.03); o.stop(actx.currentTime+0.2);}catch(e){} } voices.clear(); }
+
+// ---------- UI ----------
+const $=id=>document.getElementById(id);
+function showChord(c){
+  $('chordName').textContent=chordName(c);
+  $('chordNotes').textContent=c.map(noteName).join('  ');
+  if(S.mode==='scale') renderDegrees();
+}
+function setStatus(txt,cls){ const el=$('status'); el.textContent=txt; el.className='status '+(cls||''); }
+
+function wireSeg(id){
+  const seg=$(id), key=seg.dataset.key;
+  seg.addEventListener('click',e=>{
+    const b=e.target.closest('button'); if(!b) return;
+    const raw=b.dataset.v; S[key]=isNaN(+raw)?raw:+raw; save(); renderAll();
+    if(key==='mode'||key==='smooth') lastVoicing=null;
+  });
+}
+function renderSeg(id){ const seg=$(id), v=String(S[seg.dataset.key]); seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===v)); }
+
+function renderSlots(){
+  $('slots').innerHTML=S.slots.map((iv,i)=>`<button class="chip ${i===S.activeSlot?'on':''}" data-i="${i}"><span class="num">${i+1}</span>${quality(iv)}<small>${iv.join('·')}</small></button>`).join('');
+}
+function renderTypes(){
+  $('types').innerHTML=TYPES.map(([n])=>`<button class="chip ${n===S.type?'on':''}" data-t="${n}" title="${TYPE_DESC[n]||n}">${n}</button>`).join('');
+}
+function renderDegrees(){
+  const sc=SCALES[S.scale], saved=S.mode, base=48+S.key;
+  const items=sc.map((st,i)=>{
+    const out=[]; for(let k=0;k<S.size;k++){ const d=i+2*k; out.push(base+sc[d%7]+12*Math.floor(d/7)); }
+    const name=chordName(out), minor=/^[A-G][b#]?(m(?!aj)|dim)/.test(name);
+    const rn=(minor?ROMAN[i].toLowerCase():ROMAN[i])+(/m7b5/.test(name)?'ø':/dim/.test(name)?'°':'');
+    const kind=/m7b5/.test(name)?'half-diminished':/dim/.test(name)?'diminished':/aug|#5/.test(name)?'augmented':minor?'minor':'major';
+    const tip=`${rn} = ${FUNCS[i].toLowerCase()}, the chord built on note ${i+1} of ${NN[S.key]} ${S.scale}. ${kind[0].toUpperCase()+kind.slice(1)}: ${FUNC_DESC[i]}. Click to hear it.`;
+    return `<button class="deg ${i===lastDegree?'on':''}" data-r="${base+st}" title="${tip}"><b>${rn}</b><span>${name}</span><i>${FUNCS[i]}</i></button>`;
+  });
+  $('degrees').innerHTML=items.join('');
+}
+function renderKb(){
+  const outs=new Set([...outCount.keys()].map(k=>k%128));
+  document.querySelectorAll('#kb [data-n]').forEach(el=>{
+    const n=+el.dataset.n;
+    el.classList.toggle('in', inHeld.has(n) || (learning && learnSet.has(n)));
+    el.classList.toggle('out', outs.has(n));
+  });
+}
+function layoutKb(){
+  const kb=$('kb'), lo=36, hi=96, wrapW=kb.parentElement.clientWidth-24, W=Math.max(18,Math.min(34,Math.floor(wrapW/36))), BW=Math.round(W*0.62); let x=0, html='';
+  for(let n=lo;n<=hi;n++){
+    const black=[1,3,6,8,10].includes(n%12);
+    if(black) html+=`<div class="bk" data-n="${n}" style="left:${x-BW/2}px;width:${BW}px"></div>`;
+    else { html+=`<div class="wk" data-n="${n}" style="left:${x}px;width:${W}px">${n%12===0?`<span class="oct">C${n/12-1}</span>`:''}</div>`; x+=W; }
+  }
+  kb.style.width=x+'px'; kb.innerHTML=html; renderKb();
+  return W;
+}
+function buildKb(){
+  const kb=$('kb'), W=layoutKb();
+  let rt; window.addEventListener('resize',()=>{ clearTimeout(rt); rt=setTimeout(layoutKb,120); });
+  const ptr=new Map();
+  kb.addEventListener('pointerdown',e=>{
+    const el=e.target.closest('[data-n]'); if(!el) return; e.preventDefault();
+    if(S.preview) ensureAudio();
+    const n=+el.dataset.n;
+    if(learning){ learnFromMidi=false; learnSet.has(n)?learnSet.delete(n):learnSet.add(n); renderLearn(); renderKb(); return; }
+    ptr.set(e.pointerId,n); noteOn(1,n,100);
+  });
+  const up=e=>{ const n=ptr.get(e.pointerId); if(n!==undefined){ ptr.delete(e.pointerId); noteOff(1,n); } };
+  kb.addEventListener('pointerup',up); kb.addEventListener('pointercancel',up); kb.addEventListener('pointerleave',up);
+  if(W<=18) kb.parentElement.scrollLeft=7*W*1.2;
+}
+function renderAll(){
+  ['modeSeg','sizeSeg','oosSeg','invSeg','spreadSeg','octSeg','dirSeg','velSeg','strumModeSeg','divSeg','arpPatSeg','arpRateSeg','arpOctSeg','curveSeg'].forEach(renderSeg);
+  document.querySelectorAll('.toggle').forEach(b=>b.setAttribute('aria-pressed',!!S[b.dataset.key]));
+  ['memory','type','scale','single'].forEach(m=>$('panel-'+m).classList.toggle('hidden',S.mode!==m));
+  $('arpGate').value=S.arpGate; $('arpGateVal').textContent=S.arpGate+'%';
+  $('arpSwing').value=S.arpSwing; $('arpSwingVal').textContent=S.arpSwing===50?'straight':S.arpSwing+'%';
+  $('velFixedRow').classList.toggle('hidden',S.velMode!=='fixed');
+  $('velCurveRow').classList.toggle('hidden',S.velMode!=='played'); $('velMinRow').classList.toggle('hidden',S.velMode!=='played');
+  $('velMin').value=S.velMin; $('velMinVal').textContent=S.velMin;
+  $('strum').value=S.strum; $('strumVal').textContent=strumLabel(); $('bpm').value=S.bpm;
+  $('strumMsRow').classList.toggle('hidden',S.strumMode!=='ms');
+  $('strumDivRow').classList.toggle('hidden',S.strumMode!=='sync'); $('tempoRow').classList.toggle('hidden',S.strumMode!=='sync' && !S.arpOn);
+  $('velFixed').value=S.velFixed; $('velFixedVal').textContent=S.velFixed;
+  $('key').value=S.key; $('scale').value=S.scale; $('outCh').value=S.outCh; $('voices').value=S.voices;
+  $('bypass').setAttribute('aria-pressed',!!S.bypass); $('tips').setAttribute('aria-pressed',!!S.tips);
+  document.body.classList.toggle('notips',!S.tips); document.querySelector('.display').classList.toggle('bypassed',!!S.bypass); document.body.classList.toggle('bypassed',!!S.bypass);
+  $('modeHint').textContent = (S.bypass ? 'Bypassed: single notes' : S.mode==='single' ? 'Single notes' : S.mode==='memory' ? `Slot ${S.activeSlot+1} · ${quality(S.slots[S.activeSlot])}` : S.mode==='type' ? `Every key plays ${S.type}` : `${NN[S.key]} ${S.scale}`) + (S.arpOn&&!S.bypass ? ` · Arp ${S.arpPattern} ${S.arpRate}` : '');
+  renderSlots(); renderTypes(); renderDegrees(); renderLearn();
+}
+
+function init(){
+  $('key').innerHTML=NN.map((n,i)=>`<option value="${i}">${n}</option>`).join('');
+  $('scale').innerHTML=Object.keys(SCALES).map(s=>`<option>${s}</option>`).join('');
+  $('outCh').innerHTML='<option value="0">Follow input</option>'+Array.from({length:16},(_,i)=>`<option value="${i+1}">Ch ${i+1}</option>`).join('');
+  $('voices').innerHTML='<option value="0">No limit</option>'+[2,3,4,5,6,8,10,12,16].map(n=>`<option value="${n}">${n} voices</option>`).join('');
+  $('voices').onchange=e=>{ S.voices=+e.target.value; save(); };
+  const toggleBypass=()=>{ S.bypass=!S.bypass; save(); renderAll(); };
+  $('bypass').onclick=toggleBypass; $('bypassBar').onclick=toggleBypass;
+  $('tips').onclick=()=>{ S.tips=!S.tips; save(); renderAll(); };
+  const degPtr=new Map();
+  $('degrees').addEventListener('pointerdown',e=>{ const b=e.target.closest('[data-r]'); if(!b) return; e.preventDefault(); if(S.preview) ensureAudio(); const n=+b.dataset.r; degPtr.set(e.pointerId,n); noteOn(1,n,100); });
+  const degUp=e=>{ const n=degPtr.get(e.pointerId); if(n!==undefined){ degPtr.delete(e.pointerId); noteOff(1,n); } };
+  ['pointerup','pointercancel','pointerleave'].forEach(t=>$('degrees').addEventListener(t,degUp));
+  window._toggleBypass=toggleBypass;
+  ['modeSeg','sizeSeg','oosSeg','invSeg','spreadSeg','octSeg','dirSeg','velSeg','strumModeSeg','divSeg','arpPatSeg','arpRateSeg','arpOctSeg','curveSeg'].forEach(wireSeg);
+  $('velMin').oninput=e=>{ S.velMin=+e.target.value; save(); renderAll(); };
+  $('arpGate').oninput=e=>{ S.arpGate=+e.target.value; save(); renderAll(); };
+  $('arpSwing').oninput=e=>{ S.arpSwing=+e.target.value; save(); renderAll(); };
+  $('tap').onclick=tap;
+  $('bpm').onchange=e=>{ const v=+e.target.value; if(v>=30&&v<=300){ S.bpm=v; save(); } renderAll(); };
+  document.querySelectorAll('.toggle').forEach(b=>b.addEventListener('click',()=>{
+    const k=b.dataset.key; S[k]=!S[k]; save();
+    if(k==='latch' && !S.latch){ for(const [key,e] of active) if(e.latched){ release(e); active.delete(key);} renderKb(); }
+    if(k==='preview'){ if(S.preview) ensureAudio(); else synthAllOff(); }
+    if(k==='smooth') lastVoicing=null;
+    if(k==='arpOn'){ S.arpOn=!S.arpOn; releaseAll(); active.clear(); S.arpOn=!S.arpOn; arpIdx=0; arpStep=0; arpNext=0; }
+    renderAll();
+  }));
+  $('slots').addEventListener('click',e=>{ const b=e.target.closest('[data-i]'); if(!b) return; S.activeSlot=+b.dataset.i; save(); renderAll(); });
+  $('types').addEventListener('click',e=>{ const b=e.target.closest('[data-t]'); if(!b) return; S.type=b.dataset.t; save(); renderAll(); });
+  $('key').onchange=e=>{ S.key=+e.target.value; save(); renderAll(); };
+  $('scale').onchange=e=>{ S.scale=e.target.value; save(); renderAll(); };
+  $('outCh').onchange=e=>{ releaseAll(); S.outCh=+e.target.value; save(); };
+  $('strum').oninput=e=>{ S.strum=+e.target.value; save(); renderAll(); };
+  $('velFixed').oninput=e=>{ S.velFixed=+e.target.value; save(); renderAll(); };
+  $('learnBtn').onclick=()=>{ learnFromMidi=true; startLearn(); };
+  $('learnSave').onclick=commitLearn;
+  $('learnCancel').onclick=stopLearn;
+  $('panic').onclick=panic;
+  document.addEventListener('keydown',e=>{
+    if(e.target.tagName==='SELECT'||e.metaKey||e.ctrlKey) return;
+    if(e.key==='Escape'){ learning?stopLearn():panic(); }
+    if(e.key==='b'||e.key==='B') window._toggleBypass();
+    if(e.key==='a'||e.key==='A') document.querySelector('.toggle[data-key=arpOn]').click();
+    if(/^[1-8]$/.test(e.key)){ S.activeSlot=+e.key-1; if(S.mode!=='memory') S.mode='memory'; save(); renderAll(); }
+  });
+  if(S.preview) document.addEventListener('pointerdown',ensureAudio,{once:true});
+  buildKb(); renderAll(); initMidi();
+}
+
+// ---------- MIDI setup ----------
+function fillPorts(){
+  const ins=[...access.inputs.values()], outs=[...access.outputs.values()];
+  const opts=(list,sel)=>'<option value="">— none —</option>'+list.map(p=>`<option value="${p.id}" ${p.name===sel?'selected':''}>${p.name}</option>`).join('');
+  let inName=S.inName; if(!ins.some(p=>p.name===inName)){ const q=ins.find(p=>/qunexus/i.test(p.name)); inName=q?q.name:''; }
+  $('inSel').innerHTML=opts(ins,inName); $('outSel').innerHTML=opts(outs,S.outName);
+  $('clockSel').innerHTML=opts(ins,S.clockName).replace('— none —','No clock (manual tempo)');
+  const cp=ins.find(p=>p.name===S.clockName); if(cp!==clockInput) selectClock(cp);
+  selectInput(ins.find(p=>p.name===inName)); output=outs.find(p=>p.name===S.outName)||null;
+  updateStatus();
+}
+function selectInput(p){
+  if(input && input!==p) input.onmidimessage=null;
+  input=p||null; if(input) input.onmidimessage=onMidi;
+}
+function updateStatus(){
+  if(!input && !output) return setStatus('MIDI ready · pick ports','warn');
+  setStatus((input?input.name:'no input')+' → '+(output?output.name:'no output'), input&&output?'ok':'warn');
+}
+async function initMidi(){
+  if(!navigator.requestMIDIAccess){ setStatus('No Web MIDI here — open in Chrome or Edge','warn'); disablePorts(); return; }
+  try{ access=await navigator.requestMIDIAccess({sysex:false}); }
+  catch(e){ setStatus('MIDI blocked: allow MIDI access for this page','warn'); disablePorts(); return; }
+  access.onstatechange=()=>fillPorts();
+  $('inSel').onchange=e=>{ releaseAll(); const p=access.inputs.get(e.target.value); S.inName=p?p.name:''; save(); selectInput(p); updateStatus(); };
+  $('clockSel').onchange=e=>{ const p=access.inputs.get(e.target.value); S.clockName=p?p.name:''; save(); selectClock(p); };
+  $('outSel').onchange=e=>{ panic(); const p=access.outputs.get(e.target.value); S.outName=p?p.name:''; save(); output=p||null; updateStatus(); };
+  fillPorts();
+}
+function disablePorts(){ ['inSel','outSel','clockSel'].forEach(id=>{ $(id).innerHTML='<option>Unavailable — use on-screen keys + Preview sound</option>'; $(id).disabled=true; }); }
+
+init();
+</script>
+</body>
+</html>
