@@ -64,14 +64,15 @@ main{max-width:1280px;margin:0 auto;padding:10px 16px 8px;display:grid;gap:10px;
 .modehint{margin-left:auto;font-size:13px;color:var(--muted);text-align:right}
 .row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:0 0 8px}
 .row:last-child{margin-bottom:0}
-.row>label,.lbl{color:var(--muted);font-size:13px;min-width:66px}
+.card{--lw:72px}.a-route{--lw:86px}.a-src{--lw:100px}.a-voice{--lw:78px}.a-arp{--lw:64px}
+.row>label,.lbl{color:var(--muted);font-size:13px;width:var(--lw);flex:none}
 .sel{display:flex;align-items:center;flex:1;min-width:0;max-width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:0 6px 0 2px}
 .sel:hover{border-color:#454a51}
 .sel select{font:inherit;color:var(--text);background:transparent;border:0;outline:0;padding:7px 4px 7px 7px;flex:1;min-width:0;cursor:pointer}
 .sel select:disabled{cursor:default;color:var(--muted)}
 .sel option{background:var(--panel2);color:var(--text)}
 input[type=number]{font:500 13px var(--mono);color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:6px 8px;width:72px}
-#divSeg button,#arpRateSeg button{padding:5px 7px}#arpPatSeg button{padding:5px 6px}
+#divSeg button{padding:5px 6px}#arpRateSeg button{padding:5px 7px}#arpPatSeg button{padding:5px 6px}
 .clockinfo{font:500 11px var(--mono);color:var(--muted)}
 .clockinfo.live{color:var(--ok)}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
@@ -146,7 +147,7 @@ input[type=range]{flex:1;accent-color:var(--accent);min-width:100px}
     <h2>Performance</h2>
     <div class="row"><span class="lbl">Strum</span><div class="seg" id="strumModeSeg" data-key="strumMode"><button data-v="ms" title="Strum gap set in milliseconds">Time</button><button data-v="sync" title="Strum gap locked to the tempo as a note division">Tempo sync</button></div><span class="val" id="strumVal"></span></div>
     <div class="row" id="strumMsRow"><span class="lbl">Gap</span><input type="range" id="strum" min="0" max="150" step="1" title="Gap between each note of the chord"></div>
-    <div class="row" id="strumDivRow"><span class="lbl">Gap</span><div class="seg" id="divSeg" data-key="strumDiv" title="Gap between each note of the chord, as a note length at the current tempo"><button data-v="off">Off</button><button data-v="1/64">1/64</button><button data-v="1/32">1/32</button><button data-v="1/16T">1/16T</button><button data-v="1/16">1/16</button><button data-v="1/8T">1/8T</button><button data-v="1/8">1/8</button><button data-v="1/4">1/4</button></div></div>
+    <div class="row" id="strumDivRow"><span class="lbl">Division</span><div class="seg" id="divSeg" data-key="strumDiv" title="Gap between each note of the chord, as a note length at the current tempo"><button data-v="1/64">1/64</button><button data-v="1/32">1/32</button><button data-v="1/16T">1/16T</button><button data-v="1/16">1/16</button><button data-v="1/8T">1/8T</button><button data-v="1/8">1/8</button><button data-v="1/4">1/4</button></div></div>
     <div class="row" id="tempoRow"><span class="lbl">Tempo</span><input type="number" id="bpm" min="30" max="300" step="0.1" title="Manual tempo, used when no MIDI clock is coming in"><button id="tap" title="Tap four or more times to set the tempo">Tap</button>
       <span class="sel" style="max-width:220px" title="Follow MIDI clock from this port (e.g. your sequencer). Falls back to the manual tempo when no clock arrives."><select id="clockSel"></select></span><span class="clockinfo" id="clockInfo"></span></div>
     <div class="row"><span class="lbl">Direction</span><div class="seg" id="dirSeg" data-key="strumDir"><button data-v="up">Up</button><button data-v="down">Down</button><button data-v="alt">Alternate</button></div></div>
@@ -223,7 +224,7 @@ input[type=range]{flex:1;accent-color:var(--accent);min-width:100px}
 
   <section class="kbwrap a-kb"><div class="kb" id="kb"></div></section>
 </main>
-<footer class="credit"><p class="line"><span>QuChord: made by OPT</span><span class="ver" title="Build 13">v1.0.2</span><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></p></footer>
+<footer class="credit"><p class="line"><span>QuChord: made by OPT</span><span class="ver" title="Build 14">v1.0.3</span><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></p></footer>
 
 <script>
 "use strict";
@@ -297,7 +298,7 @@ const DEFAULTS = {
   arpOn:false, arpPattern:'up', arpRate:'1/16', arpOct:1, arpGate:60, arpSwing:50, velCurve:'linear', velMin:1
 };
 let S = structuredClone(DEFAULTS);
-try{ const s=JSON.parse(localStorage.getItem('quchord.v1')||'null'); if(s){ if(!s.layoutV){ s.tips=false; s.layoutV=2; } delete s.arpVel; S=Object.assign(S,s); } }catch(e){}
+try{ const s=JSON.parse(localStorage.getItem('quchord.v1')||'null'); if(s){ if(!s.layoutV){ s.tips=false; s.layoutV=2; } delete s.arpVel; if(s.strumDiv==='off') s.strumDiv='1/16'; S=Object.assign(S,s); } }catch(e){}
 const save=()=>{ try{ localStorage.setItem('quchord.v1',JSON.stringify(S)); }catch(e){} };
 
 // ---------- chord engine ----------
