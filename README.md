@@ -8,7 +8,7 @@ The whole app is one HTML file and runs in the browser with no install. Made by 
 
 **Use it now: https://opt-fx.github.io/quchord/**
 
-**Status: version 1.0.1.**
+**Status: version 1.0.2.**
 
 ## What it does
 
