@@ -233,7 +233,7 @@ input[type=range]{flex:1;accent-color:var(--accent);min-width:100px}
 
   <section class="kbwrap a-kb"><div class="kb" id="kb"></div></section>
 </main>
-<footer class="credit"><p class="line"><span>QuChord: made by OPT</span><span class="ver" title="Build 18">v1.1</span><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></p></footer>
+<footer class="credit"><p class="line"><span>QuChord: made by OPT</span><span class="ver" title="Build 19">v1.1.1</span><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></p></footer>
 
 <script>
 "use strict";
@@ -359,7 +359,7 @@ function melodyChord(note){
   lastVoicing=[...v];
   if(S.bassMode==='root'){ let r=root+12*S.octave-12; while(r>=Math.min(...v)) r-=12; v.push(r); }
   let res=[...new Set(v)].filter(x=>x>=0&&x<=127).sort((a,c)=>a-c);
-  if(S.voices>0 && res.length>S.voices) res=limitVoices(res,root,top);
+  if(S.voices>0 && res.length>vlim()) res=limitVoices(res,root,top,vlim());
   return res;
 }
 function foldRange(v){
@@ -383,11 +383,13 @@ function buildChord(note){
   if(S.rangeOn) v=foldRange(v);
   if(S.bassMode==='root'){ let r=b.root+o-12; while(r>=Math.min(...v)) r-=12; v.push(r); }
   let res=[...new Set(v)].filter(x=>x>=0&&x<=127).sort((a,b)=>a-b);
-  if(S.voices>0 && res.length>S.voices) res=limitVoices(res,b.root);
+  if(S.voices>0 && res.length>vlim()) res=limitVoices(res,b.root,undefined,vlim());
   return res;
 }
 // keep the notes that define the chord: root, 3rd, 7th/6th, then extensions, then the 5th; doubled notes go first
-function limitVoices(notes,root,keep){
+// voices left for the chord: one is taken by a pedal note when Bass is set to Pedal
+const vlim=()=>Math.max(1,S.voices-(S.bassMode==='pedal'&&!S.bypass?1:0));
+function limitVoices(notes,root,keep,max=S.voices){
   const rels=notes.map(n=>((n-root)%12+12)%12), hasThird=rels.some(r=>r===3||r===4), seen=new Set();
   const ranked=notes.map((n,i)=>{
     const r=rels[i]; let p;
@@ -398,7 +400,7 @@ function limitVoices(notes,root,keep){
     }
     return {n,p,i};
   }).sort((a,b)=>a.p-b.p||a.i-b.i);
-  return ranked.slice(0,S.voices).map(x=>x.n).sort((a,b)=>a-b);
+  return ranked.slice(0,max).map(x=>x.n).sort((a,b)=>a-b);
 }
 
 // ---------- tempo ----------
@@ -550,7 +552,8 @@ function noteOn(inCh,note,vel){
     showVel(vel,active.get(key).v); showChord(chord); arpTick(); pedalSync(); return;
   }
   if(S.voices>0){ // free voices: release oldest chords first
-    for(const [k,e] of active){ if(outCount.size+chord.length<=S.voices) break; release(e); active.delete(k); }
+    const extra=(S.bassMode==='pedal'&&!pedal)?1:0; // pedal about to start
+    for(const [k,e] of active){ if(outCount.size+chord.length+extra<=S.voices) break; release(e); active.delete(k); }
   }
   const ch=outChFor(inCh), v=S.bypass?vel:(S.velMode==='fixed'?S.velFixed:mapVel(vel));
   showVel(vel,v);
