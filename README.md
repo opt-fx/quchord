@@ -1,14 +1,14 @@
 # QuChord
 
-**A chord generator and arpeggiator for the QuNexus.** An unofficial community tool, not affiliated with or endorsed by Muse Kinetics.
+**A chord generator and arpeggiator for any MIDI keyboard.**
 
-QuChord sits between a MIDI keyboard and your synths. Play one note and it sends a whole chord, a strum or an arpeggio. It was made for the QuNexus, which has no chord memory of its own, but it works with any MIDI keyboard.
+QuChord sits between a MIDI keyboard and your synths. Play one note and it sends a whole chord, a strum or an arpeggio. It started as a way to add chord memory to a QuNexus, but it works with any MIDI keyboard or controller.
 
 The whole app is one HTML file and runs in the browser with no install. Made by OPT.
 
 **Use it now: https://opt-fx.github.io/quchord/**
 
-**Status: version 1.0.**
+**Status: version 1.0.1.**
 
 ## What it does
 
@@ -30,11 +30,11 @@ Settings are remembered in the browser.
 ## Quick start
 
 1. Open the app's page, or download `index.html` and open it from disk, in Chrome or Edge. Allow MIDI access when asked.
-2. Under **Routing**, set **MIDI in** to your keyboard (a port with QuNexus in its name is picked automatically) and **MIDI out** to the port that reaches your synth or sequencer.
+2. Under **Routing**, set **MIDI in** to your keyboard and **MIDI out** to the port that reaches your synth or sequencer. Your choices are remembered.
 3. Switch off any other route from the keyboard to the same destination, or you'll hear the single note as well as the chord.
 4. Pick a chord source and play.
 
-With a QuNexus, run it with MPE off: QuChord sends each chord on one channel.
+If your keyboard has an MPE mode, turn it off: QuChord sends each chord on one channel.
 
 ## Keys
 

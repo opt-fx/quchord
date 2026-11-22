@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>QuChord — chord generator for QuNexus</title>
+<title>QuChord — chord generator and arpeggiator for any MIDI keyboard</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22%3E%3Cdefs%3E%3Cmask id=%22sunmask%22%3E%3Crect width=%22400%22 height=%22400%22 fill=%22%23fff%22/%3E%3Crect y=%22224%22 width=%22400%22 height=%228%22/%3E%3Crect y=%22262%22 width=%22400%22 height=%2213%22/%3E%3Crect y=%22302%22 width=%22400%22 height=%2218%22/%3E%3Crect y=%22344%22 width=%22400%22 height=%2224%22/%3E%3C/mask%3E%3C/defs%3E%3Ccircle cx=%22200%22 cy=%22200%22 r=%22196%22 fill=%22%23FF8A1F%22 mask=%22url%28%23sunmask%29%22/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
@@ -117,7 +117,7 @@ input[type=range]{flex:1;accent-color:var(--accent);min-width:100px}
 </head>
 <body>
 <header><div class="hwrap">
-  <div class="brand"><span class="logo"></span><h1>QuChord</h1><span class="sub">chord generator · Web MIDI</span></div>
+  <div class="brand"><span class="logo"></span><h1>QuChord</h1><span class="sub">chord generator &amp; arpeggiator · Web MIDI</span></div>
   <div class="status" id="status">MIDI: starting…</div>
   <button id="tips" class="tipsbtn" title="Show or hide the explanation notes in each panel">Tips</button>
   <button id="bypass" class="bypass" aria-pressed="false" title="Bypass (B): pass single notes straight through, no chords. Routing stays as it is.">Bypass</button>
@@ -129,7 +129,7 @@ input[type=range]{flex:1;accent-color:var(--accent);min-width:100px}
 <main>
   <section class="card display a-disp">
     <div class="chordname" id="chordName">—</div>
-    <div><div class="chordnotes" id="chordNotes">Play a key</div><div class="chordnotes" id="velInfo" style="font-size:11px;margin-top:4px;opacity:.75" title="Velocity received from the QuNexus and velocity sent out"></div></div>
+    <div><div class="chordnotes" id="chordNotes">Play a key</div><div class="chordnotes" id="velInfo" style="font-size:11px;margin-top:4px;opacity:.75" title="Velocity received from your keyboard and velocity sent out"></div></div>
     <div class="modehint" id="modeHint"></div>
   </section>
 
@@ -139,7 +139,7 @@ input[type=range]{flex:1;accent-color:var(--accent);min-width:100px}
     <div class="row"><label for="outSel">MIDI out</label><span class="sel"><select id="outSel"></select></span></div>
     <div class="row"><label for="outCh">Out channel</label><span class="sel"><select id="outCh"></select></span></div>
     <div class="row"><span class="lbl">Monitor</span><button class="toggle" data-key="preview" title="Hear QuChord's output in the browser, as well as sending it out">Preview sound</button></div>
-    <p class="tip">Send QuChord's output to the Cirklon and switch off any direct QuNexus → Cirklon route, or you'll hear the single note as well as the chord. Run the QuNexus with MPE off.</p>
+    <p class="tip">Send QuChord's output to your synth or sequencer, and switch off any direct route from the keyboard to the same place, or you'll hear the single note as well as the chord. If your keyboard has an MPE mode, turn it off: QuChord sends each chord on one channel.</p>
   </section>
 
   <section class="card fx a-perf">
@@ -148,17 +148,17 @@ input[type=range]{flex:1;accent-color:var(--accent);min-width:100px}
     <div class="row" id="strumMsRow"><span class="lbl">Gap</span><input type="range" id="strum" min="0" max="150" step="1" title="Gap between each note of the chord"></div>
     <div class="row" id="strumDivRow"><span class="lbl">Gap</span><div class="seg" id="divSeg" data-key="strumDiv" title="Gap between each note of the chord, as a note length at the current tempo"><button data-v="off">Off</button><button data-v="1/64">1/64</button><button data-v="1/32">1/32</button><button data-v="1/16T">1/16T</button><button data-v="1/16">1/16</button><button data-v="1/8T">1/8T</button><button data-v="1/8">1/8</button><button data-v="1/4">1/4</button></div></div>
     <div class="row" id="tempoRow"><span class="lbl">Tempo</span><input type="number" id="bpm" min="30" max="300" step="0.1" title="Manual tempo, used when no MIDI clock is coming in"><button id="tap" title="Tap four or more times to set the tempo">Tap</button>
-      <span class="sel" style="max-width:220px" title="Follow MIDI clock from this port (e.g. the Cirklon). Falls back to the manual tempo when no clock arrives."><select id="clockSel"></select></span><span class="clockinfo" id="clockInfo"></span></div>
+      <span class="sel" style="max-width:220px" title="Follow MIDI clock from this port (e.g. your sequencer). Falls back to the manual tempo when no clock arrives."><select id="clockSel"></select></span><span class="clockinfo" id="clockInfo"></span></div>
     <div class="row"><span class="lbl">Direction</span><div class="seg" id="dirSeg" data-key="strumDir"><button data-v="up">Up</button><button data-v="down">Down</button><button data-v="alt">Alternate</button></div></div>
     <div class="row"><span class="lbl">Velocity</span><div class="seg" id="velSeg" data-key="velMode"><button data-v="played">As played</button><button data-v="fixed">Fixed</button></div></div>
-    <div class="row" id="velCurveRow"><span class="lbl">Curve</span><div class="seg" id="curveSeg" data-key="velCurve"><button data-v="softer" title="Much louder for light hits">Softer</button><button data-v="soft" title="Louder for light hits">Soft</button><button data-v="linear" title="As the pads send it">Linear</button><button data-v="hard" title="Need to hit harder for loud notes">Hard</button></div></div>
+    <div class="row" id="velCurveRow"><span class="lbl">Curve</span><div class="seg" id="curveSeg" data-key="velCurve"><button data-v="softer" title="Much louder for light hits">Softer</button><button data-v="soft" title="Louder for light hits">Soft</button><button data-v="linear" title="As the keyboard sends it">Linear</button><button data-v="hard" title="Need to hit harder for loud notes">Hard</button></div></div>
     <div class="row" id="velMinRow"><span class="lbl">Minimum</span><input type="range" id="velMin" min="1" max="110" title="Lowest velocity sent, however lightly you hit"><span class="val" id="velMinVal"></span></div>
     <div class="row" id="velFixedRow"><span class="lbl">Fixed vel.</span><input type="range" id="velFixed" min="1" max="127"><span class="val" id="velFixedVal"></span></div>
     <div class="row">
       <button class="toggle" data-key="latch" title="Chord keeps sounding until the next one">Latch</button>
       <button class="toggle" data-key="pass" title="Forward CC, pitch bend, pressure and program change">Pass CC / bend</button>
     </div>
-    <p class="tip"><b>Strum</b> spreads the chord's notes out in time like a strummed guitar: 15–40 ms is subtle, 80 ms+ is a harp-like roll. <b>Tempo sync</b> sets the gap as a note length instead, so a 1/16 strum on a 4-note chord rolls out over one beat in time with the track. Pick the Cirklon as the clock port to follow its tempo, or type a tempo or tap it in. <b>Latch</b> keeps the chord sounding after you let go, until you play the next one. It's handy for holding a pad while you tweak the synth. <b>Velocity</b>: if the pads need hitting hard, use <b>As played</b> with the <b>Soft</b> or <b>Softer</b> curve and raise <b>Minimum</b>. The readout under the chord name shows what comes in and what goes out. <b>Pass CC / bend</b> forwards the QuNexus's pressure, tilt and bend messages so modulation still works.</p>
+    <p class="tip"><b>Strum</b> spreads the chord's notes out in time like a strummed guitar: 15–40 ms is subtle, 80 ms+ is a harp-like roll. <b>Tempo sync</b> sets the gap as a note length instead, so a 1/16 strum on a 4-note chord rolls out over one beat in time with the track. Pick your sequencer's port as the clock port to follow its tempo, or type a tempo or tap it in. <b>Latch</b> keeps the chord sounding after you let go, until you play the next one. It's handy for holding a pad while you tweak the synth. <b>Velocity</b>: if your keys or pads need hitting hard, use <b>As played</b> with the <b>Soft</b> or <b>Softer</b> curve and raise <b>Minimum</b>. The readout under the chord name shows what comes in and what goes out. <b>Pass CC / bend</b> forwards the keyboard's pressure, aftertouch and pitch bend messages so modulation still works.</p>
   </section>
 
   <section class="card fx a-src">
@@ -218,12 +218,12 @@ input[type=range]{flex:1;accent-color:var(--accent);min-width:100px}
     <div class="row"><span class="lbl">Octaves</span><div class="seg" id="arpOctSeg" data-key="arpOct" title="How many octaves the pattern climbs through"><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button></div></div>
     <div class="row"><span class="lbl">Gate</span><input type="range" id="arpGate" min="10" max="100" title="How long each note lasts as a share of the step: short = staccato, 100% = legato"><span class="val" id="arpGateVal"></span></div>
     <div class="row"><span class="lbl">Swing</span><input type="range" id="arpSwing" min="50" max="75" title="50% = straight; 66% = triplet shuffle; 75% = hard swing"><span class="val" id="arpSwingVal"></span></div>
-    <p class="tip">The arpeggiator plays whatever QuChord would play (the chord's notes, or the keys you hold in <b>Single notes</b> mode) one at a time, in time with the tempo. For a bassline: choose <b>Single notes</b>, hold one key, set Octaves to 2 and try <b>Up</b> at 1/16. Hold two or three keys to make a pattern from them, and turn on <b>Latch</b> to keep it running hands-free. With a clock port selected in Performance, it locks to the Cirklon's MIDI clock, starts new notes on the next step and restarts its pattern when the Cirklon starts. Without one, it uses the manual tempo there. <b>Gate</b> sets note length, and <b>Swing</b> delays every second step for shuffle.</p>
+    <p class="tip">The arpeggiator plays whatever QuChord would play (the chord's notes, or the keys you hold in <b>Single notes</b> mode) one at a time, in time with the tempo. For a bassline: choose <b>Single notes</b>, hold one key, set Octaves to 2 and try <b>Up</b> at 1/16. Hold two or three keys to make a pattern from them, and turn on <b>Latch</b> to keep it running hands-free. With a clock port selected in Performance, it locks to that MIDI clock, starts new notes on the next step and restarts its pattern when the sequencer starts. Without one, it uses the manual tempo there. <b>Gate</b> sets note length, and <b>Swing</b> delays every second step for shuffle.</p>
   </section>
 
   <section class="kbwrap a-kb"><div class="kb" id="kb"></div></section>
 </main>
-<footer class="credit"><p class="line"><span>QuChord: made by OPT</span><span class="sep">·</span><span>Unofficial community tool, not affiliated with or endorsed by Muse Kinetics.</span><span class="ver" title="Build 11">v1.0</span><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></p></footer>
+<footer class="credit"><p class="line"><span>QuChord: made by OPT</span><span class="ver" title="Build 12">v1.0.1</span><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></p></footer>
 
 <script>
 "use strict";
@@ -556,7 +556,7 @@ function renderLearn(){
   $('learnSave').classList.toggle('hidden',!learning);
   $('learnCancel').classList.toggle('hidden',!learning);
   $('learnInfo').textContent = learning
-    ? (learnSet.size ? 'Got: '+[...learnSet].sort((a,b)=>a-b).map(noteName).join(' ')+'  ('+chordName([...learnSet])+')' : `Slot ${S.activeSlot+1}: hold a chord on the QuNexus and let go — or tap keys below, then Save`)
+    ? (learnSet.size ? 'Got: '+[...learnSet].sort((a,b)=>a-b).map(noteName).join(' ')+'  ('+chordName([...learnSet])+')' : `Slot ${S.activeSlot+1}: hold a chord on your keyboard and let go — or tap keys below, then Save`)
     : 'Number keys 1–8 select a slot.';
 }
 
@@ -731,7 +731,7 @@ function init(){
 function fillPorts(){
   const ins=[...access.inputs.values()], outs=[...access.outputs.values()];
   const opts=(list,sel)=>'<option value="">— none —</option>'+list.map(p=>`<option value="${p.id}" ${p.name===sel?'selected':''}>${p.name}</option>`).join('');
-  let inName=S.inName; if(!ins.some(p=>p.name===inName)){ const q=ins.find(p=>/qunexus/i.test(p.name)); inName=q?q.name:''; }
+  let inName=S.inName; if(!ins.some(p=>p.name===inName)){ const q=ins.find(p=>!/\b(IAC|through|thru|virtual)\b/i.test(p.name))||ins[0]; inName=q?q.name:''; }
   $('inSel').innerHTML=opts(ins,inName); $('outSel').innerHTML=opts(outs,S.outName);
   $('clockSel').innerHTML=opts(ins,S.clockName).replace('— none —','No clock (manual tempo)');
   const cp=ins.find(p=>p.name===S.clockName); if(cp!==clockInput) selectClock(cp);
