@@ -154,12 +154,12 @@ input[type=range]{flex:1;accent-color:var(--accent);min-width:100px}
 
   <section class="card fx a-perf">
     <h2>Performance</h2>
-    <div class="row"><span class="lbl">Strum</span><div class="seg" id="strumModeSeg" data-key="strumMode"><button data-v="ms" title="Strum gap set in milliseconds">Time</button><button data-v="sync" title="Strum gap locked to the tempo as a note division">Tempo sync</button></div><span class="val" id="strumVal"></span></div>
-    <div class="row" id="strumMsRow"><span class="lbl">Gap</span><input type="range" id="strum" min="0" max="150" step="1" title="Gap between each note of the chord"></div>
+    <div class="row"><span class="lbl">Strum</span><button class="toggle" data-key="strumOn" title="Strum on/off: spread each chord's notes out in time">On</button><div class="seg" id="strumModeSeg" data-key="strumMode"><button data-v="ms" title="Strum gap set in milliseconds">Time</button><button data-v="sync" title="Strum gap locked to the tempo as a note division">Tempo sync</button></div></div>
+    <div class="row" id="strumMsRow"><span class="lbl">Gap</span><input type="range" id="strum" min="1" max="150" step="1" title="Gap between each note of the chord"><span class="val" id="strumVal"></span></div>
     <div class="row" id="strumDivRow"><span class="lbl">Division</span><div class="seg" id="divSeg" data-key="strumDiv" title="Gap between each note of the chord, as a note length at the current tempo"><button data-v="1/64">1/64</button><button data-v="1/32">1/32</button><button data-v="1/16T">1/16T</button><button data-v="1/16">1/16</button><button data-v="1/8T">1/8T</button><button data-v="1/8">1/8</button><button data-v="1/4">1/4</button></div></div>
     <div class="row" id="tempoRow"><span class="lbl">Tempo</span><input type="number" id="bpm" min="30" max="300" step="0.1" title="Manual tempo, used when no MIDI clock is coming in"><button id="tap" title="Tap four or more times to set the tempo">Tap</button>
       <button class="toggle" data-key="useClock" title="Follow the MIDI clock from the Clock in port (Routing). Off: use the manual tempo even if clock is arriving.">MIDI clock</button><span class="clockinfo" id="syncNote"></span></div>
-    <div class="row"><span class="lbl">Direction</span><div class="seg" id="dirSeg" data-key="strumDir"><button data-v="up">Up</button><button data-v="down">Down</button><button data-v="alt">Alternate</button></div></div>
+    <div class="row" id="dirRow"><span class="lbl">Direction</span><div class="seg" id="dirSeg" data-key="strumDir"><button data-v="up">Up</button><button data-v="down">Down</button><button data-v="alt">Alternate</button></div></div>
     <div class="row"><span class="lbl">Velocity</span><div class="seg" id="velSeg" data-key="velMode"><button data-v="played">As played</button><button data-v="fixed">Fixed</button></div></div>
     <div class="row" id="velCurveRow"><span class="lbl">Curve</span><div class="seg" id="curveSeg" data-key="velCurve"><button data-v="softer" title="Much louder for light hits">Softer</button><button data-v="soft" title="Louder for light hits">Soft</button><button data-v="linear" title="As the keyboard sends it">Linear</button><button data-v="hard" title="Need to hit harder for loud notes">Hard</button></div></div>
     <div class="row" id="velMinRow"><span class="lbl">Minimum</span><input type="range" id="velMin" min="1" max="110" title="Lowest velocity sent, however lightly you hit"><span class="val" id="velMinVal"></span></div>
@@ -168,7 +168,7 @@ input[type=range]{flex:1;accent-color:var(--accent);min-width:100px}
       <button class="toggle" data-key="latch" title="Chord keeps sounding until the next one">Latch</button>
       <button class="toggle" data-key="pass" title="Forward CC, pitch bend, pressure and program change">Pass CC / bend</button>
     </div>
-    <p class="tip"><b>Strum</b> spreads the chord's notes out in time like a strummed guitar: 15–40 ms is subtle, 80 ms+ is a harp-like roll. <b>Tempo sync</b> sets the gap as a note length instead, so a 1/16 strum on a 4-note chord rolls out over one beat in time with the track. Set <b>Clock in</b> (Routing) to your sequencer's port to follow its tempo, or type a tempo or tap it in. <b>Latch</b> keeps the chord sounding after you let go, until you play the next one. It's handy for holding a pad while you tweak the synth. <b>Velocity</b>: if your keys or pads need hitting hard, use <b>As played</b> with the <b>Soft</b> or <b>Softer</b> curve and raise <b>Minimum</b>. The readout under the chord name shows what comes in and what goes out. <b>Pass CC / bend</b> forwards the keyboard's pressure, aftertouch and pitch bend messages so modulation still works.</p>
+    <p class="tip">Switch <b>Strum</b> on to spread the chord's notes out in time like a strummed guitar: 15–40 ms is subtle, 80 ms+ is a harp-like roll. <b>Tempo sync</b> sets the gap as a note length instead, so a 1/16 strum on a 4-note chord rolls out over one beat in time with the track. Set <b>Clock in</b> (Routing) to your sequencer's port to follow its tempo, or type a tempo or tap it in. <b>Latch</b> keeps the chord sounding after you let go, until you play the next one. It's handy for holding a pad while you tweak the synth. <b>Velocity</b>: if your keys or pads need hitting hard, use <b>As played</b> with the <b>Soft</b> or <b>Softer</b> curve and raise <b>Minimum</b>. The readout under the chord name shows what comes in and what goes out. <b>Pass CC / bend</b> forwards the keyboard's pressure, aftertouch and pitch bend messages so modulation still works.</p>
   </section>
 
   <section class="card fx a-src">
@@ -233,7 +233,7 @@ input[type=range]{flex:1;accent-color:var(--accent);min-width:100px}
 
   <section class="kbwrap a-kb"><div class="kb" id="kb"></div></section>
 </main>
-<footer class="credit"><p class="line"><span>QuChord: made by OPT</span><span class="ver" title="Build 19">v1.1.1</span><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></p></footer>
+<footer class="credit"><p class="line"><span>QuChord: made by OPT</span><span class="ver" title="Build 20">v1.1.2</span><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></p></footer>
 
 <script>
 "use strict";
@@ -301,13 +301,13 @@ const DEFAULTS = {
   slots:[[0,4,7],[0,3,7],[0,4,7,11],[0,3,7,10],[0,4,7,10],[0,5,7],[0,7,14],[0,3,7,10,14]],
   type:'maj', key:0, scale:'Major (Ionian)', size:3, oos:'snap',
   inversion:0, spread:'close', octave:0, melody:'off', bassMode:'off', pedalNote:36, pedalMode:'play', rangeOn:false, rangeLo:48, rangeHi:72,
-  strum:0, strumDir:'up', velMode:'played', velFixed:100, latch:false, pass:true, preview:false,
+  strum:30, strumDir:'up', velMode:'played', velFixed:100, latch:false, pass:true, preview:false,
   voices:0, bypass:false, tips:false, layoutV:2,
-  strumMode:'ms', strumDiv:'1/16', bpm:120, clockName:'', useClock:true,
+  strumOn:false, strumMode:'ms', strumDiv:'1/16', bpm:120, clockName:'', useClock:true,
   arpOn:false, arpPattern:'up', arpRate:'1/16', arpOct:1, arpGate:60, arpSwing:50, velCurve:'linear', velMin:1
 };
 let S = structuredClone(DEFAULTS);
-try{ const s=JSON.parse(localStorage.getItem('quchord.v1')||'null'); if(s){ if(!s.layoutV){ s.tips=false; s.layoutV=2; } delete s.arpVel; if(s.strumDiv==='off') s.strumDiv='1/16'; if(s.smooth) s.inversion='smooth'; if(s.bass) s.bassMode='root'; delete s.smooth; delete s.bass; S=Object.assign(S,s); } }catch(e){}
+try{ const s=JSON.parse(localStorage.getItem('quchord.v1')||'null'); if(s){ if(!s.layoutV){ s.tips=false; s.layoutV=2; } delete s.arpVel; if(s.strumDiv==='off') s.strumDiv='1/16'; if(s.strumOn===undefined){ s.strumOn = s.strumMode==='sync' || s.strum>0; if(!s.strum) s.strum=30; } if(s.smooth) s.inversion='smooth'; if(s.bass) s.bassMode='root'; delete s.smooth; delete s.bass; S=Object.assign(S,s); } }catch(e){}
 const save=()=>{ try{ localStorage.setItem('quchord.v1',JSON.stringify(S)); }catch(e){} };
 
 // ---------- chord engine ----------
@@ -409,7 +409,7 @@ let clockInput=null, clockTicks=[], lastClock=0, clockBpm=0, clockTick=0;
 const clockLive=()=>{ const d=performance.now()-lastClock; return d>=0 && d<1000 && clockBpm>20 && clockBpm<400; };
 const following=()=>S.useClock && clockLive();
 const tempo=()=>following()?clockBpm:S.bpm;
-const strumMs=()=>S.strumMode==='sync' ? (60000/tempo())*DIVS[S.strumDiv] : S.strum;
+const strumMs=()=>!S.strumOn ? 0 : S.strumMode==='sync' ? (60000/tempo())*DIVS[S.strumDiv] : S.strum;
 function onClock(ev){
   const st=ev.data[0];
   if(st===0xFA){ clockTick=0; arpIdx=0; arpStep=0; return; }
@@ -456,7 +456,7 @@ setInterval(()=>{
   else { el.textContent=''; el.className='clockinfo'; }
   if(S.strumMode==='sync') $('strumVal').textContent=strumLabel();
 },250);
-const strumLabel=()=>{ const ms=strumMs(); return ms? Math.round(ms)+' ms':'off'; };
+const strumLabel=()=>{ const ms=strumMs(); return S.strumOn ? Math.round(ms)+' ms' : ''; };
 
 // ---------- arpeggiator ----------
 let arpIdx=0, arpStep=0, arpNext=0; const arpTimers=new Set();
@@ -742,8 +742,8 @@ function renderAll(){
   $('velCurveRow').classList.toggle('hidden',S.velMode!=='played'); $('velMinRow').classList.toggle('hidden',S.velMode!=='played');
   $('velMin').value=S.velMin; $('velMinVal').textContent=S.velMin;
   $('strum').value=S.strum; $('strumVal').textContent=strumLabel(); $('bpm').value=S.bpm;
-  $('strumMsRow').classList.toggle('hidden',S.strumMode!=='ms');
-  $('strumDivRow').classList.toggle('hidden',S.strumMode!=='sync'); $('tempoRow').classList.toggle('hidden',S.strumMode!=='sync' && !S.arpOn);
+  $('strumMsRow').classList.toggle('hidden',!S.strumOn||S.strumMode!=='ms'); $('dirRow').classList.toggle('hidden',!S.strumOn); $('strumModeSeg').classList.toggle('dimmed',!S.strumOn);
+  $('strumDivRow').classList.toggle('hidden',!S.strumOn||S.strumMode!=='sync'); $('tempoRow').classList.toggle('hidden',!(S.strumOn&&S.strumMode==='sync') && !S.arpOn);
   $('velFixed').value=S.velFixed; $('velFixedVal').textContent=S.velFixed;
   $('key').value=S.key; $('scale').value=S.scale; $('outCh').value=S.outCh; $('voices').value=S.voices;
   $('bypass').setAttribute('aria-pressed',!!S.bypass); $('tips').setAttribute('aria-pressed',!!S.tips);
