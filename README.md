@@ -8,7 +8,7 @@ The whole app is one HTML file and runs in the browser with no install. Made by 
 
 **Use it now: https://opt-fx.github.io/quchord/**
 
-**Status: version 1.2.**
+**Status: version 1.2.1.**
 
 ## What it does
 
@@ -23,7 +23,7 @@ The whole app is one HTML file and runs in the browser with no install. Made by 
 - **Voice limit.** Trim chords to fit a synth's polyphony, dropping the least important notes first.
 - **Strum.** Switch it on to spread a chord's notes in milliseconds or as a note length locked to the tempo, upwards, downwards or alternating.
 - **Arpeggiator.** Up, Down, Up-Down, Down-Up, As played and Random, at 1/4 to 1/32 with triplets, over 1–4 octaves, with gate and swing. Latch keeps it running hands-free.
-- **Euclid sequencer.** Four lanes of Euclidean rhythms built from the chord's notes. Each lane has steps, hits, rotate, which chord note it plays (low, 2nd, 3rd, top, cycle or random), octave, velocity, gate and chance. Lanes of different lengths drift against each other, and a ring display shows each pattern as it plays.
+- **Euclid sequencer.** Four lanes of Euclidean rhythms built from the chord's notes. Each lane has steps, hits, rotate, which chord note it plays (low, 2nd, 3rd, top, cycle or random), octave, velocity, gate and chance. Lanes of different lengths drift against each other, and a ring display shows each pattern as it plays. Dice randomise a lane or all of them, keeping the first lane as a steady bass.
 - **Tempo.** Follows MIDI clock from a port you choose (for example a sequencer), or a tempo you type or tap in. A MIDI clock switch lets you ignore the clock and use your own tempo. The arpeggiator and Euclid lanes restart when the clock starts, so recordings line up with the bar.
 - **Velocity.** As played, with a curve and a minimum for keyboards that need hitting hard, or fixed.
 - **Pass-through.** Pressure, pitch bend, CCs and program changes are forwarded, and polyphonic aftertouch is copied to every note of the chord.
@@ -48,6 +48,7 @@ If your keyboard has an MPE mode, turn it off: QuChord sends each chord on one c
 | 1–8 | Select a chord memory slot |
 | A | Arpeggiator on/off |
 | E | Euclid sequencer on/off |
+| R | Randomise the arpeggiator or Euclid lanes |
 | B | Bypass on/off |
 | Esc | Panic (all notes off), or cancel Learn |
 

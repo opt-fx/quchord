@@ -61,7 +61,7 @@ main{max-width:1280px;margin:0 auto;padding:10px 16px 8px;display:grid;gap:10px;
 #rings{width:150px;height:150px}
 .a-rhy-euc{display:flex;flex-direction:column}
 .lanes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 28px}
-.lanes .half{display:grid;grid-template-columns:46px repeat(3,minmax(0,1fr)) minmax(0,1.6fr) minmax(0,1.2fr) repeat(3,minmax(0,1fr));gap:5px 6px;align-items:center}
+.lanes .half{display:grid;grid-template-columns:46px repeat(3,minmax(0,1fr)) minmax(0,1.6fr) minmax(0,1.2fr) repeat(3,minmax(0,1fr)) 34px;gap:5px 6px;align-items:center}
 .lanes .hd{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 .lanes input[type=number]{width:100%;padding:4px 6px}
 .lanes .sel select{padding:4px 2px 4px 6px}
@@ -69,6 +69,9 @@ main{max-width:1280px;margin:0 auto;padding:10px 16px 8px;display:grid;gap:10px;
 .lanebtn i{width:10px;height:10px;border-radius:50%;background:#3a3e44;flex:none}
 .lanebtn[aria-pressed=true]{color:var(--text)}
 .lane-off{opacity:.4}
+.dicebtn{padding:3px 6px;display:inline-flex;align-items:center;color:var(--text)}
+.dicebtn svg{display:block}
+.dicebtn:active svg{transform:rotate(90deg);transition:transform .12s}
 .a-route{display:flex;flex-direction:column}.a-route .monitor{margin-top:auto;padding-top:8px}.a-route{grid-area:route}.a-perf{grid-area:perf}.a-arp{grid-area:arp}.a-src{grid-area:src}.a-voice{grid-area:voice}.a-kb{grid-area:kb}
 @media (max-width:1100px){main{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"disp disp" "route perf" "src src" "voice arp" "kb kb"}}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 14px}
@@ -234,7 +237,7 @@ input[type=range]{flex:1;accent-color:var(--accent);min-width:100px}
 
   <section class="card fx a-arp">
     <h2>Rhythm</h2>
-    <div class="row"><span class="lbl">Mode</span><div class="seg" id="rhySeg" data-key="rhythm"><button data-v="off" title="No rhythm: chords play as you hold them">Off</button><button data-v="arp" title="Arpeggiator (A): plays the chord's notes one at a time">Arp</button><button data-v="euclid" title="Euclidean sequencer (E): four lanes of evenly spread rhythms, built from the chord's notes">Euclid</button></div></div>
+    <div class="row"><span class="lbl">Mode</span><div class="seg" id="rhySeg" data-key="rhythm"><button data-v="off" title="No rhythm: chords play as you hold them">Off</button><button data-v="arp" title="Arpeggiator (A): plays the chord's notes one at a time">Arp</button><button data-v="euclid" title="Euclidean sequencer (E): four lanes of evenly spread rhythms, built from the chord's notes">Euclid</button></div><button class="dicebtn" id="rhyDice" aria-label="Randomise" title="Randomise (R)"><svg class="dice" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="21" rx="5.5" fill="currentColor"/><g fill="#161412"><circle cx="7.4" cy="7.4" r="2.2"/><circle cx="16.6" cy="7.4" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="7.4" cy="16.6" r="2.2"/><circle cx="16.6" cy="16.6" r="2.2"/></g></svg></button></div>
     <div class="row arponly"><span class="lbl">Pattern</span><div class="seg" id="arpPatSeg" data-key="arpPattern">
         <button data-v="up" title="Lowest to highest">Up</button><button data-v="down" title="Highest to lowest">Down</button><button data-v="updown" title="Up then back down">Up-Dn</button><button data-v="downup" title="Down then back up">Dn-Up</button><button data-v="played" title="In the order you pressed the keys">Played</button><button data-v="random" title="Random note each step">Rand</button></div></div>
     <div class="row"><span class="lbl">Rate</span><div class="seg" id="arpRateSeg" data-key="arpRate"><button data-v="1/4">1/4</button><button data-v="1/8">1/8</button><button data-v="1/8T">1/8T</button><button data-v="1/16">1/16</button><button data-v="1/16T">1/16T</button><button data-v="1/32">1/32</button></div></div>
@@ -242,13 +245,13 @@ input[type=range]{flex:1;accent-color:var(--accent);min-width:100px}
     <div class="row arponly"><span class="lbl">Gate</span><input type="range" id="arpGate" min="10" max="100" title="How long each note lasts as a share of the step: short = staccato, 100% = legato"><span class="val" id="arpGateVal"></span></div>
     <div class="ringrow hidden" id="ringRow"><svg id="rings" viewBox="0 0 150 150" aria-label="Euclidean lanes: one ring per lane, filled dots are hits"></svg></div>
     <div class="row"><span class="lbl">Swing</span><input type="range" id="arpSwing" min="50" max="75" title="50% = straight; 66% = triplet shuffle; 75% = hard swing"><span class="val" id="arpSwingVal"></span></div>
-    <p class="tip"><b>Arp</b> and <b>Euclid</b> both run from the notes QuChord would play, so they follow the chord you hold. The arpeggiator plays whatever QuChord would play (the chord's notes, or the keys you hold in <b>Single notes</b> mode) one at a time, in time with the tempo. For a bassline: choose <b>Single notes</b>, hold one key, set Octaves to 2 and try <b>Up</b> at 1/16. Hold two or three keys to make a pattern from them, and turn on <b>Latch</b> to keep it running hands-free. With a port chosen in <b>Clock in</b> (Routing), it locks to that MIDI clock, starts new notes on the next step and restarts its pattern when the sequencer starts. Without one, it uses the manual tempo in Performance. <b>Gate</b> sets note length, and <b>Swing</b> delays every second step for shuffle. <b>Euclid</b> shows four lanes in place of the keyboard, with a ring for each lane here. Each lane spreads its <b>Hits</b> as evenly as possible over its <b>Steps</b> (3 hits in 8 steps is the classic tresillo), <b>Rotate</b> shifts where the pattern starts, and <b>Note</b> picks which chord note it plays: Low, 2nd, 3rd, Top, Cycle (each hit moves up the chord) or Random. Give lanes different lengths and they drift against each other, so the pattern keeps evolving. <b>Chance</b> lets hits drop out at random. Rate and Swing apply to all lanes.</p>
+    <p class="tip"><b>Arp</b> and <b>Euclid</b> both run from the notes QuChord would play, so they follow the chord you hold. The arpeggiator plays whatever QuChord would play (the chord's notes, or the keys you hold in <b>Single notes</b> mode) one at a time, in time with the tempo. For a bassline: choose <b>Single notes</b>, hold one key, set Octaves to 2 and try <b>Up</b> at 1/16. Hold two or three keys to make a pattern from them, and turn on <b>Latch</b> to keep it running hands-free. With a port chosen in <b>Clock in</b> (Routing), it locks to that MIDI clock, starts new notes on the next step and restarts its pattern when the sequencer starts. Without one, it uses the manual tempo in Performance. <b>Gate</b> sets note length, and <b>Swing</b> delays every second step for shuffle. <b>Euclid</b> shows four lanes in place of the keyboard, with a ring for each lane here. Each lane spreads its <b>Hits</b> as evenly as possible over its <b>Steps</b> (3 hits in 8 steps is the classic tresillo), <b>Rotate</b> shifts where the pattern starts, and <b>Note</b> picks which chord note it plays: Low, 2nd, 3rd, Top, Cycle (each hit moves up the chord) or Random. Give lanes different lengths and they drift against each other, so the pattern keeps evolving. <b>Chance</b> lets hits drop out at random. Rate and Swing apply to all lanes. The <b>dice</b> randomise a lane, or every lane that's on (or the arpeggiator in Arp mode); press <b>R</b> to roll. Lane 1 stays a sparse bass lane, so a roll keeps a groove underneath.</p>
   </section>
 
   <section class="kbwrap a-kb"><div class="kb" id="kb"></div></section>
   <section class="card fx a-euc hidden" id="eucPanel"><div class="lanes" id="lanes"></div></section>
 </main>
-<footer class="credit"><p class="line"><span>QuChord: made by OPT</span><span class="ver" title="Build 21">v1.2</span><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></p></footer>
+<footer class="credit"><p class="line"><span>QuChord: made by OPT</span><span class="ver" title="Build 22">v1.2.1</span><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></p></footer>
 
 <script>
 "use strict";
@@ -777,6 +780,26 @@ function buildKb(){
   if(W<=18) kb.parentElement.scrollLeft=7*W*1.2;
 }
 // ---------- Euclid UI ----------
+const DICE='<svg class="dice" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="21" rx="5.5" fill="currentColor"/><g fill="#161412"><circle cx="7.4" cy="7.4" r="2.2"/><circle cx="16.6" cy="7.4" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="7.4" cy="16.6" r="2.2"/><circle cx="16.6" cy="16.6" r="2.2"/></g></svg>';
+const rnd=n=>Math.floor(Math.random()*n), pick=a=>a[rnd(a.length)];
+// musical random: lane 1 stays a sparse bass lane, the others roam
+function randomLane(i){
+  const L=S.lanes[i], steps=pick([4,5,6,7,8,8,9,10,11,12,12,13,16,16]);
+  const maxH=Math.max(1,Math.round(steps*(i===0?0.4:0.6)));
+  Object.assign(L,{steps, hits:1+rnd(maxH), rotate:rnd(steps),
+    note: i===0?pick(['low','low','2nd','cycle']):pick(['2nd','3rd','top','cycle','cycle','random']),
+    oct: i===0?pick([-1,-1,0]):pick([-1,0,0,1,1]),
+    vel:70+rnd(51), gate:20+rnd(51), prob:i===0?pick([100,100,90]):pick([100,100,100,90,80,70,60])});
+}
+function randomArp(){
+  S.arpPattern=pick(['up','down','updown','downup','played','random']);
+  S.arpOct=pick([1,1,2,2,3]); S.arpGate=25+rnd(56);
+}
+function rollDice(){
+  if(S.rhythm==='arp') randomArp();
+  else if(S.rhythm==='euclid') S.lanes.forEach((L,i)=>{ if(L.on) randomLane(i); });
+  save(); renderAll();
+}
 const LANE_COL=['var(--accent)','var(--amber)','#5fd28a','#7aa2ff'];
 function setRhythm(v){ releaseAll(); active.clear(); S.rhythm=v; arpIdx=0; arpStep=0; arpNext=0; laneCyc.fill(0); save(); renderAll(); renderRings(-1); }
 let lanesBuilt=false;
@@ -785,7 +808,7 @@ function renderLanes(){
   if(!lanesBuilt){
     const NOTE_OPTS=[['low','Low'],['2nd','2nd'],['3rd','3rd'],['top','Top'],['cycle','Cycle'],['random','Random']].map(([v,t])=>`<option value="${v}">${t}</option>`).join('');
     const OCT_OPTS=[-2,-1,0,1,2].map(o=>`<option value="${o}">${o>0?'+'+o:o===0?'0':'−'+(-o)}</option>`).join('');
-    const head='<span></span>'+['Steps','Hits','Rot','Note','Oct','Vel','Gate','Chance'].map(x=>`<span class="hd">${x}</span>`).join('');
+    const head='<span></span>'+['Steps','Hits','Rot','Note','Oct','Vel','Gate','Chance'].map(x=>`<span class="hd">${x}</span>`).join('')+'<span></span>';
     const rows=['',''];
     S.lanes.forEach((L,i)=>{
       rows[i>>1]+=`<button class="lanebtn" data-lane="${i}" data-k="on" title="Lane ${i+1} on/off"><i></i>${i+1}</button>`+
@@ -796,13 +819,15 @@ function renderLanes(){
         `<span class="sel"><select data-lane="${i}" data-k="oct" title="Octave shift">${OCT_OPTS}</select></span>`+
         `<input type="number" data-lane="${i}" data-k="vel" min="1" max="127" title="Velocity">`+
         `<input type="number" data-lane="${i}" data-k="gate" min="5" max="100" title="Note length as a share of the step (%)">`+
-        `<input type="number" data-lane="${i}" data-k="prob" min="0" max="100" title="Chance each hit plays (%)">`;
+        `<input type="number" data-lane="${i}" data-k="prob" min="0" max="100" title="Chance each hit plays (%)">`+
+        `<button class="dicebtn" data-lane="${i}" data-k="dice" aria-label="Randomise lane ${i+1}" title="Randomise lane ${i+1}">${DICE}</button>`;
     });
     box.innerHTML=rows.map(r=>`<div class="half">${head}${r}</div>`).join(''); lanesBuilt=true;
     const onEdit=e=>{
       const el=e.target.closest('[data-lane]'); if(!el) return;
       const i=+el.dataset.lane, k=el.dataset.k, L=S.lanes[i];
       if(k==='on'){ L.on=!L.on; }
+      else if(k==='dice') randomLane(i);
       else if(k==='note') L.note=el.value;
       else { let v=parseInt(el.value,10); if(isNaN(v)) return;
         const lim={steps:[1,32],hits:[0,L.steps],rotate:[0,L.steps-1],oct:[-2,2],vel:[1,127],gate:[5,100],prob:[0,100]}[k];
@@ -810,12 +835,13 @@ function renderLanes(){
         if(k==='steps'){ L.hits=Math.min(L.hits,v); L.rotate=Math.min(L.rotate,v-1); } }
       save(); renderLanes(); renderRings(lastRingStep);
     };
-    box.addEventListener('click',e=>{ if(e.target.closest('.lanebtn')) onEdit(e); });
+    box.addEventListener('click',e=>{ if(e.target.closest('.lanebtn,.dicebtn')) onEdit(e); });
     box.addEventListener('change',onEdit);
   }
   S.lanes.forEach((L,i)=>{
     box.querySelectorAll(`[data-lane="${i}"]`).forEach(el=>{
       const k=el.dataset.k;
+      if(k==='dice') return;
       if(k==='on'){ el.setAttribute('aria-pressed',L.on); el.querySelector('i').style.background=L.on?LANE_COL[i]:''; }
       else if(document.activeElement!==el) el.value=L[k];
       if(k!=='on') el.closest('.sel')?.classList.toggle('lane-off',!L.on), el.classList.toggle('lane-off',!L.on);
@@ -850,7 +876,8 @@ function renderAll(){
   document.querySelectorAll('.arponly').forEach(r=>r.classList.toggle('hidden',S.rhythm!=='arp'));
   const euc=S.rhythm==='euclid'; $('eucPanel').classList.toggle('hidden',!euc); $('ringRow').classList.toggle('hidden',!euc); document.querySelector('.kbwrap').classList.toggle('hidden',euc);
   ['arpRateSeg','arpSwing'].forEach(id=>$(id).closest('.row').classList.toggle('dimmed',S.rhythm==='off'));
-  renderLanes();
+  renderLanes(); $('rhyDice').classList.toggle('hidden',S.rhythm==='off');
+  $('rhyDice').title = S.rhythm==='arp' ? 'Randomise the arpeggiator: pattern, octaves and gate (R)' : 'Randomise all lanes that are on (R)';
   $('arpGate').value=S.arpGate; $('arpGateVal').textContent=S.arpGate+'%';
   $('arpSwing').value=S.arpSwing; $('arpSwingVal').textContent=S.arpSwing===50?'straight':S.arpSwing+'%';
   $('velFixedRow').classList.toggle('hidden',S.velMode!=='fixed');
@@ -888,6 +915,7 @@ function init(){
   window._toggleBypass=toggleBypass;
   ['modeSeg','sizeSeg','oosSeg','invSeg','spreadSeg','octSeg','dirSeg','velSeg','strumModeSeg','divSeg','arpPatSeg','arpRateSeg','arpOctSeg','curveSeg','melSeg','bassSeg','pedalModeSeg','rhySeg'].forEach(wireSeg);
   $('velMin').oninput=e=>{ S.velMin=+e.target.value; save(); renderAll(); };
+  $('rhyDice').onclick=rollDice;
   $('arpGate').oninput=e=>{ S.arpGate=+e.target.value; save(); renderAll(); };
   $('arpSwing').oninput=e=>{ S.arpSwing=+e.target.value; save(); renderAll(); };
   $('tap').onclick=tap;
@@ -916,6 +944,7 @@ function init(){
     if(e.key==='b'||e.key==='B') window._toggleBypass();
     if(e.key==='a'||e.key==='A') setRhythm(S.rhythm==='arp'?'off':'arp');
     if(e.key==='e'||e.key==='E') setRhythm(S.rhythm==='euclid'?'off':'euclid');
+    if(e.key==='r'||e.key==='R') rollDice();
     if(/^[1-8]$/.test(e.key)){ S.activeSlot=+e.key-1; if(S.mode!=='memory') S.mode='memory'; save(); renderAll(); }
   });
   if(S.preview) document.addEventListener('pointerdown',ensureAudio,{once:true});
