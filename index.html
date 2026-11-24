@@ -56,6 +56,19 @@ button.primary{background:var(--accent);border-color:var(--accent);color:#fff;fo
 main{max-width:1280px;margin:0 auto;padding:10px 16px 8px;display:grid;gap:10px;grid-template-columns:repeat(3,minmax(0,1fr));
   grid-template-areas:"disp disp disp" "route perf arp" "src src voice" "kb kb kb"}
 .a-disp{grid-area:disp}
+.a-euc{grid-area:kb;padding:10px 14px}
+.ringrow{display:flex;justify-content:center;margin:2px 0 8px}
+#rings{width:150px;height:150px}
+.a-rhy-euc{display:flex;flex-direction:column}
+.lanes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 28px}
+.lanes .half{display:grid;grid-template-columns:46px repeat(3,minmax(0,1fr)) minmax(0,1.6fr) minmax(0,1.2fr) repeat(3,minmax(0,1fr));gap:5px 6px;align-items:center}
+.lanes .hd{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.lanes input[type=number]{width:100%;padding:4px 6px}
+.lanes .sel select{padding:4px 2px 4px 6px}
+.lanebtn{display:flex;align-items:center;gap:6px;padding:4px 7px;font:600 13px var(--mono);color:var(--muted)}
+.lanebtn i{width:10px;height:10px;border-radius:50%;background:#3a3e44;flex:none}
+.lanebtn[aria-pressed=true]{color:var(--text)}
+.lane-off{opacity:.4}
 .a-route{display:flex;flex-direction:column}.a-route .monitor{margin-top:auto;padding-top:8px}.a-route{grid-area:route}.a-perf{grid-area:perf}.a-arp{grid-area:arp}.a-src{grid-area:src}.a-voice{grid-area:voice}.a-kb{grid-area:kb}
 @media (max-width:1100px){main{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"disp disp" "route perf" "src src" "voice arp" "kb kb"}}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 14px}
@@ -130,7 +143,7 @@ input[type=range]{flex:1;accent-color:var(--accent);min-width:100px}
   <button id="bypass" class="bypass" aria-pressed="false" title="Bypass (B): pass single notes straight through, no chords. Routing stays as it is.">Bypass</button>
   <button id="panic" class="danger" title="All notes off (Esc)">Panic</button>
 </div>
-  <div class="bypassbar" id="bypassBar" title="Click or press B to turn Bypass off"><div class="in">BYPASS ON <span>Single notes pass straight through. Chords, strum, voicing and the arpeggiator are off.</span><em>B to turn off</em></div></div>
+  <div class="bypassbar" id="bypassBar" title="Click or press B to turn Bypass off"><div class="in">BYPASS ON <span>Single notes pass straight through. Chords, strum, voicing, the arpeggiator and Euclid are off.</span><em>B to turn off</em></div></div>
 </header>
 
 <main>
@@ -220,20 +233,22 @@ input[type=range]{flex:1;accent-color:var(--accent);min-width:100px}
   </section>
 
   <section class="card fx a-arp">
-    <h2>Arpeggiator</h2>
-    <div class="row"><button class="toggle" data-key="arpOn" title="Arpeggiator on/off (A)">Arpeggiator on</button></div>
-    <div class="row"><span class="lbl">Pattern</span><div class="seg" id="arpPatSeg" data-key="arpPattern">
+    <h2>Rhythm</h2>
+    <div class="row"><span class="lbl">Mode</span><div class="seg" id="rhySeg" data-key="rhythm"><button data-v="off" title="No rhythm: chords play as you hold them">Off</button><button data-v="arp" title="Arpeggiator (A): plays the chord's notes one at a time">Arp</button><button data-v="euclid" title="Euclidean sequencer (E): four lanes of evenly spread rhythms, built from the chord's notes">Euclid</button></div></div>
+    <div class="row arponly"><span class="lbl">Pattern</span><div class="seg" id="arpPatSeg" data-key="arpPattern">
         <button data-v="up" title="Lowest to highest">Up</button><button data-v="down" title="Highest to lowest">Down</button><button data-v="updown" title="Up then back down">Up-Dn</button><button data-v="downup" title="Down then back up">Dn-Up</button><button data-v="played" title="In the order you pressed the keys">Played</button><button data-v="random" title="Random note each step">Rand</button></div></div>
     <div class="row"><span class="lbl">Rate</span><div class="seg" id="arpRateSeg" data-key="arpRate"><button data-v="1/4">1/4</button><button data-v="1/8">1/8</button><button data-v="1/8T">1/8T</button><button data-v="1/16">1/16</button><button data-v="1/16T">1/16T</button><button data-v="1/32">1/32</button></div></div>
-    <div class="row"><span class="lbl">Octaves</span><div class="seg" id="arpOctSeg" data-key="arpOct" title="How many octaves the pattern climbs through"><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button></div></div>
-    <div class="row"><span class="lbl">Gate</span><input type="range" id="arpGate" min="10" max="100" title="How long each note lasts as a share of the step: short = staccato, 100% = legato"><span class="val" id="arpGateVal"></span></div>
+    <div class="row arponly"><span class="lbl">Octaves</span><div class="seg" id="arpOctSeg" data-key="arpOct" title="How many octaves the pattern climbs through"><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button></div></div>
+    <div class="row arponly"><span class="lbl">Gate</span><input type="range" id="arpGate" min="10" max="100" title="How long each note lasts as a share of the step: short = staccato, 100% = legato"><span class="val" id="arpGateVal"></span></div>
+    <div class="ringrow hidden" id="ringRow"><svg id="rings" viewBox="0 0 150 150" aria-label="Euclidean lanes: one ring per lane, filled dots are hits"></svg></div>
     <div class="row"><span class="lbl">Swing</span><input type="range" id="arpSwing" min="50" max="75" title="50% = straight; 66% = triplet shuffle; 75% = hard swing"><span class="val" id="arpSwingVal"></span></div>
-    <p class="tip">The arpeggiator plays whatever QuChord would play (the chord's notes, or the keys you hold in <b>Single notes</b> mode) one at a time, in time with the tempo. For a bassline: choose <b>Single notes</b>, hold one key, set Octaves to 2 and try <b>Up</b> at 1/16. Hold two or three keys to make a pattern from them, and turn on <b>Latch</b> to keep it running hands-free. With a port chosen in <b>Clock in</b> (Routing), it locks to that MIDI clock, starts new notes on the next step and restarts its pattern when the sequencer starts. Without one, it uses the manual tempo in Performance. <b>Gate</b> sets note length, and <b>Swing</b> delays every second step for shuffle.</p>
+    <p class="tip"><b>Arp</b> and <b>Euclid</b> both run from the notes QuChord would play, so they follow the chord you hold. The arpeggiator plays whatever QuChord would play (the chord's notes, or the keys you hold in <b>Single notes</b> mode) one at a time, in time with the tempo. For a bassline: choose <b>Single notes</b>, hold one key, set Octaves to 2 and try <b>Up</b> at 1/16. Hold two or three keys to make a pattern from them, and turn on <b>Latch</b> to keep it running hands-free. With a port chosen in <b>Clock in</b> (Routing), it locks to that MIDI clock, starts new notes on the next step and restarts its pattern when the sequencer starts. Without one, it uses the manual tempo in Performance. <b>Gate</b> sets note length, and <b>Swing</b> delays every second step for shuffle. <b>Euclid</b> shows four lanes in place of the keyboard, with a ring for each lane here. Each lane spreads its <b>Hits</b> as evenly as possible over its <b>Steps</b> (3 hits in 8 steps is the classic tresillo), <b>Rotate</b> shifts where the pattern starts, and <b>Note</b> picks which chord note it plays: Low, 2nd, 3rd, Top, Cycle (each hit moves up the chord) or Random. Give lanes different lengths and they drift against each other, so the pattern keeps evolving. <b>Chance</b> lets hits drop out at random. Rate and Swing apply to all lanes.</p>
   </section>
 
   <section class="kbwrap a-kb"><div class="kb" id="kb"></div></section>
+  <section class="card fx a-euc hidden" id="eucPanel"><div class="lanes" id="lanes"></div></section>
 </main>
-<footer class="credit"><p class="line"><span>QuChord: made by OPT</span><span class="ver" title="Build 20">v1.1.2</span><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></p></footer>
+<footer class="credit"><p class="line"><span>QuChord: made by OPT</span><span class="ver" title="Build 21">v1.2</span><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></p></footer>
 
 <script>
 "use strict";
@@ -304,10 +319,15 @@ const DEFAULTS = {
   strum:30, strumDir:'up', velMode:'played', velFixed:100, latch:false, pass:true, preview:false,
   voices:0, bypass:false, tips:false, layoutV:2,
   strumOn:false, strumMode:'ms', strumDiv:'1/16', bpm:120, clockName:'', useClock:true,
-  arpOn:false, arpPattern:'up', arpRate:'1/16', arpOct:1, arpGate:60, arpSwing:50, velCurve:'linear', velMin:1
+  rhythm:'off', arpPattern:'up', arpRate:'1/16', arpOct:1, arpGate:60, arpSwing:50, velCurve:'linear', velMin:1,
+  lanes:[
+    {on:true, steps:16,hits:4,rotate:0,note:'low',oct:-1,vel:110,gate:50,prob:100},
+    {on:true, steps:8, hits:3,rotate:0,note:'cycle',oct:0,vel:90,gate:40,prob:100},
+    {on:true, steps:12,hits:5,rotate:2,note:'top',oct:1,vel:80,gate:30,prob:85},
+    {on:false,steps:5, hits:2,rotate:0,note:'random',oct:1,vel:70,gate:25,prob:60}]
 };
 let S = structuredClone(DEFAULTS);
-try{ const s=JSON.parse(localStorage.getItem('quchord.v1')||'null'); if(s){ if(!s.layoutV){ s.tips=false; s.layoutV=2; } delete s.arpVel; if(s.strumDiv==='off') s.strumDiv='1/16'; if(s.strumOn===undefined){ s.strumOn = s.strumMode==='sync' || s.strum>0; if(!s.strum) s.strum=30; } if(s.smooth) s.inversion='smooth'; if(s.bass) s.bassMode='root'; delete s.smooth; delete s.bass; S=Object.assign(S,s); } }catch(e){}
+try{ const s=JSON.parse(localStorage.getItem('quchord.v1')||'null'); if(s){ if(!s.layoutV){ s.tips=false; s.layoutV=2; } delete s.arpVel; if(s.strumDiv==='off') s.strumDiv='1/16'; if(s.arpOn!==undefined){ s.rhythm=s.arpOn?'arp':'off'; delete s.arpOn; } if(s.lanes) s.lanes=DEFAULTS.lanes.map((d,i)=>Object.assign({},d,s.lanes[i]||{})); if(s.strumOn===undefined){ s.strumOn = s.strumMode==='sync' || s.strum>0; if(!s.strum) s.strum=30; } if(s.smooth) s.inversion='smooth'; if(s.bass) s.bassMode='root'; delete s.smooth; delete s.bass; S=Object.assign(S,s); } }catch(e){}
 const save=()=>{ try{ localStorage.setItem('quchord.v1',JSON.stringify(S)); }catch(e){} };
 
 // ---------- chord engine ----------
@@ -412,7 +432,7 @@ const tempo=()=>following()?clockBpm:S.bpm;
 const strumMs=()=>!S.strumOn ? 0 : S.strumMode==='sync' ? (60000/tempo())*DIVS[S.strumDiv] : S.strum;
 function onClock(ev){
   const st=ev.data[0];
-  if(st===0xFA){ clockTick=0; arpIdx=0; arpStep=0; return; }
+  if(st===0xFA){ clockTick=0; arpIdx=0; arpStep=0; laneCyc.fill(0); return; }
   if(st!==0xF8) return;
   const t=performance.now(); // don't trust ev.timeStamp: its time base differs between browsers/OSes
   if(lastClock && t-lastClock<500){ clockTicks.push(t-lastClock); if(clockTicks.length>48) clockTicks.shift(); }
@@ -420,13 +440,14 @@ function onClock(ev){
   lastClock=t;
   if(clockTicks.length>=12){ const avg=clockTicks.reduce((a,b)=>a+b,0)/clockTicks.length; clockBpm=60000/(avg*24); }
   // arpeggiator locked to clock ticks (24 per quarter note)
-  if(S.arpOn && !S.bypass && following()){
+  if(rhythmOn() && following()){
     const tps=Math.round(24*DIVS[S.arpRate]);
     if(clockTick%tps===0){
+      const stepNo=Math.floor(clockTick/tps); // bar-aligned: counts from the sequencer's Start
       if(arpPool().length){
-        const stepMs=tps*60000/(clockBpm*24), sw=(S.arpSwing-50)/50, odd=arpStep%2===1;
-        playStep(t+(odd?sw*stepMs:0), stepMs*(odd?1-sw:1+sw)); arpStep++;
-      } else { arpIdx=0; arpStep=0; }
+        const stepMs=tps*60000/(clockBpm*24), sw=(S.arpSwing-50)/50, odd=stepNo%2===1;
+        rhythmStep(t+(odd?sw*stepMs:0), stepMs*(odd?1-sw:1+sw), stepNo); arpStep++;
+      } else { arpIdx=0; arpStep=0; laneCyc.fill(0); }
     }
   }
   clockTick++;
@@ -474,13 +495,41 @@ function arpSeq(){
   if(S.arpPattern==='downup'){ const d=[...ex].reverse(); return d.length>2?[...d,...d.slice(1,-1).reverse()]:d; }
   return ex;
 }
+const rhythmOn=()=>S.rhythm!=='off' && !S.bypass;
+function rhythmStep(t,stepMs,stepNo){ if(S.rhythm==='euclid') euclidStep(t,stepMs,stepNo); else playStep(t,stepMs); }
 function playStep(t,stepMs){
   const seq=arpSeq(); if(!seq.length) return;
-  const pn=performance.now(); if(!(t>=pn-50 && t<=pn+1000)) t=pn;
-  if(!(stepMs>0 && stepMs<10000)) stepMs=125;
   const it = S.arpPattern==='random' ? seq[Math.floor(Math.random()*seq.length)] : seq[arpIdx%seq.length];
   arpIdx++;
-  const gate=Math.max(5,Math.min(stepMs*S.arpGate/100, stepMs-2)), k=(it.ch-1)*128+it.n, now=performance.now();
+  playNote(it.n,it.ch,it.v,t,stepMs,S.arpGate);
+}
+// ---------- Euclidean lanes ----------
+const laneCyc=[0,0,0,0];
+function euclidHit(L,pos){
+  const n=L.steps, k=Math.min(L.hits,n); if(k<=0) return false;
+  const p=((pos-L.rotate)%n+n)%n; return (p*k)%n<k;
+}
+function euclidStep(t,stepMs,stepNo){
+  const pool=arpPool().sort((a,b)=>a.n-b.n); if(!pool.length) return;
+  const played=new Set();
+  S.lanes.forEach((L,i)=>{
+    if(!L.on) return;
+    const pos=stepNo%L.steps; if(!euclidHit(L,pos)) return;
+    if(Math.random()*100>=L.prob) return;
+    const idx = L.note==='low'?0 : L.note==='2nd'?1 : L.note==='3rd'?2 : L.note==='top'?pool.length-1
+      : L.note==='cycle'?laneCyc[i]++ : Math.floor(Math.random()*pool.length);
+    const it=pool[idx%pool.length], n=it.n+12*L.oct;
+    if(n<0||n>127||played.has(n)) return;
+    if(S.voices>0 && outCount.size>=S.voices) return; // earlier lanes win when the synth runs out of voices
+    played.add(n); playNote(n,it.ch,L.vel,t,stepMs,L.gate);
+  });
+  const d=Math.max(0,t-performance.now()); setTimeout(()=>renderRings(stepNo),d);
+}
+function playNote(n,ch,v,t,stepMs,gatePct){
+  const pn=performance.now(); if(!(t>=pn-50 && t<=pn+1000)) t=pn;
+  if(!(stepMs>0 && stepMs<10000)) stepMs=125;
+  const it={n,ch,v};
+  const gate=Math.max(5,Math.min(stepMs*gatePct/100, stepMs-2)), k=(it.ch-1)*128+it.n, now=performance.now();
   outCount.set(k,(outCount.get(k)||0)+1);
   send([0x90|(it.ch-1),it.n,it.v],t);
   send([0x80|(it.ch-1),it.n,0],t+gate);
@@ -489,12 +538,12 @@ function playStep(t,stepMs){
   arpTimers.add(tOn); arpTimers.add(tOff);
 }
 function arpTick(){
-  if(!S.arpOn || S.bypass || following()){ arpNext=0; return; }
-  if(!arpPool().length){ arpNext=0; arpIdx=0; arpStep=0; return; }
+  if(!rhythmOn() || following()){ arpNext=0; return; }
+  if(!arpPool().length){ if(arpStep) renderRings(-1); arpNext=0; arpIdx=0; arpStep=0; laneCyc.fill(0); return; }
   const now=performance.now(); if(!arpNext || arpNext<now-50) arpNext=now;
   while(arpNext<now+30){
     const step=60000/tempo()*DIVS[S.arpRate], sw=(S.arpSwing-50)/50, dur=step*(arpStep%2===0?1+sw:1-sw);
-    playStep(arpNext,dur); arpNext+=dur; arpStep++;
+    rhythmStep(arpNext,dur,arpStep); arpNext+=dur; arpStep++;
   }
 }
 setInterval(arpTick,5);
@@ -547,7 +596,7 @@ function noteOn(inCh,note,vel){
   if(active.has(key)){ release(active.get(key)); active.delete(key); }
   const chord=S.bypass?[note]:buildChord(note);
   if(!chord||!chord.length){ renderKb(); return; }
-  if(S.arpOn && !S.bypass){
+  if(rhythmOn()){
     active.set(key,{notes:chord,ch:outChFor(inCh),times:{},latched:false,arp:true,v:S.velMode==='fixed'?S.velFixed:mapVel(vel)});
     showVel(vel,active.get(key).v); showChord(chord); arpTick(); pedalSync(); return;
   }
@@ -670,7 +719,7 @@ function wireSeg(id){
   const seg=$(id), key=seg.dataset.key;
   seg.addEventListener('click',e=>{
     const b=e.target.closest('button'); if(!b) return;
-    const raw=b.dataset.v; S[key]=isNaN(+raw)?raw:+raw; save(); renderAll();
+    const raw=b.dataset.v, val=isNaN(+raw)?raw:+raw; if(key==='rhythm') setRhythm(val); else { S[key]=val; save(); renderAll(); }
     if(key==='mode'||key==='inversion'||key==='melody') lastVoicing=null;
   });
 }
@@ -727,8 +776,70 @@ function buildKb(){
   kb.addEventListener('pointerup',up); kb.addEventListener('pointercancel',up); kb.addEventListener('pointerleave',up);
   if(W<=18) kb.parentElement.scrollLeft=7*W*1.2;
 }
+// ---------- Euclid UI ----------
+const LANE_COL=['var(--accent)','var(--amber)','#5fd28a','#7aa2ff'];
+function setRhythm(v){ releaseAll(); active.clear(); S.rhythm=v; arpIdx=0; arpStep=0; arpNext=0; laneCyc.fill(0); save(); renderAll(); renderRings(-1); }
+let lanesBuilt=false;
+function renderLanes(){
+  const box=$('lanes');
+  if(!lanesBuilt){
+    const NOTE_OPTS=[['low','Low'],['2nd','2nd'],['3rd','3rd'],['top','Top'],['cycle','Cycle'],['random','Random']].map(([v,t])=>`<option value="${v}">${t}</option>`).join('');
+    const OCT_OPTS=[-2,-1,0,1,2].map(o=>`<option value="${o}">${o>0?'+'+o:o===0?'0':'−'+(-o)}</option>`).join('');
+    const head='<span></span>'+['Steps','Hits','Rot','Note','Oct','Vel','Gate','Chance'].map(x=>`<span class="hd">${x}</span>`).join('');
+    const rows=['',''];
+    S.lanes.forEach((L,i)=>{
+      rows[i>>1]+=`<button class="lanebtn" data-lane="${i}" data-k="on" title="Lane ${i+1} on/off"><i></i>${i+1}</button>`+
+        `<input type="number" data-lane="${i}" data-k="steps" min="1" max="32" title="Steps: pattern length">`+
+        `<input type="number" data-lane="${i}" data-k="hits" min="0" max="32" title="Hits: notes spread evenly over the steps">`+
+        `<input type="number" data-lane="${i}" data-k="rotate" min="0" max="31" title="Rotate: shift where the pattern starts">`+
+        `<span class="sel"><select data-lane="${i}" data-k="note" title="Which chord note this lane plays">${NOTE_OPTS}</select></span>`+
+        `<span class="sel"><select data-lane="${i}" data-k="oct" title="Octave shift">${OCT_OPTS}</select></span>`+
+        `<input type="number" data-lane="${i}" data-k="vel" min="1" max="127" title="Velocity">`+
+        `<input type="number" data-lane="${i}" data-k="gate" min="5" max="100" title="Note length as a share of the step (%)">`+
+        `<input type="number" data-lane="${i}" data-k="prob" min="0" max="100" title="Chance each hit plays (%)">`;
+    });
+    box.innerHTML=rows.map(r=>`<div class="half">${head}${r}</div>`).join(''); lanesBuilt=true;
+    const onEdit=e=>{
+      const el=e.target.closest('[data-lane]'); if(!el) return;
+      const i=+el.dataset.lane, k=el.dataset.k, L=S.lanes[i];
+      if(k==='on'){ L.on=!L.on; }
+      else if(k==='note') L.note=el.value;
+      else { let v=parseInt(el.value,10); if(isNaN(v)) return;
+        const lim={steps:[1,32],hits:[0,L.steps],rotate:[0,L.steps-1],oct:[-2,2],vel:[1,127],gate:[5,100],prob:[0,100]}[k];
+        v=Math.max(lim[0],Math.min(lim[1],v)); L[k]=v;
+        if(k==='steps'){ L.hits=Math.min(L.hits,v); L.rotate=Math.min(L.rotate,v-1); } }
+      save(); renderLanes(); renderRings(lastRingStep);
+    };
+    box.addEventListener('click',e=>{ if(e.target.closest('.lanebtn')) onEdit(e); });
+    box.addEventListener('change',onEdit);
+  }
+  S.lanes.forEach((L,i)=>{
+    box.querySelectorAll(`[data-lane="${i}"]`).forEach(el=>{
+      const k=el.dataset.k;
+      if(k==='on'){ el.setAttribute('aria-pressed',L.on); el.querySelector('i').style.background=L.on?LANE_COL[i]:''; }
+      else if(document.activeElement!==el) el.value=L[k];
+      if(k!=='on') el.closest('.sel')?.classList.toggle('lane-off',!L.on), el.classList.toggle('lane-off',!L.on);
+    });
+  });
+  renderRings(lastRingStep);
+}
+let lastRingStep=-1;
+function renderRings(step){
+  lastRingStep=step; const svg=$('rings'); if(!svg||S.rhythm!=='euclid') return;
+  const R=[66,52,38,24]; let h='';
+  S.lanes.forEach((L,i)=>{
+    const n=L.steps, r=R[i], dot=i<2?4:3.2, pos=step>=0?step%n:-1;
+    h+=`<circle cx="75" cy="75" r="${r}" fill="none" stroke="#2c3035" stroke-width="1"/>`;
+    for(let k=0;k<n;k++){
+      const a=-Math.PI/2+2*Math.PI*k/n, x=75+r*Math.cos(a), y=75+r*Math.sin(a), hit=euclidHit(L,k), cur=k===pos;
+      const fill=hit?(L.on?LANE_COL[i]:'#555a60'):'#2f3337';
+      h+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${cur?dot+1.6:dot}" fill="${fill}"${cur?' stroke="#fff" stroke-width="1.4"':''}${L.on?'':' opacity=".45"'}/>`;
+    }
+  });
+  svg.innerHTML=h;
+}
 function renderAll(){
-  ['modeSeg','sizeSeg','oosSeg','invSeg','spreadSeg','octSeg','dirSeg','velSeg','strumModeSeg','divSeg','arpPatSeg','arpRateSeg','arpOctSeg','curveSeg','melSeg','bassSeg','pedalModeSeg'].forEach(renderSeg);
+  ['modeSeg','sizeSeg','oosSeg','invSeg','spreadSeg','octSeg','dirSeg','velSeg','strumModeSeg','divSeg','arpPatSeg','arpRateSeg','arpOctSeg','curveSeg','melSeg','bassSeg','pedalModeSeg','rhySeg'].forEach(renderSeg);
   document.querySelectorAll('.toggle').forEach(b=>b.setAttribute('aria-pressed',!!S[b.dataset.key]));
   ['memory','type','scale','single'].forEach(m=>$('panel-'+m).classList.toggle('hidden',S.mode!==m));
   $('pedalWrap').classList.toggle('hidden',S.bassMode!=='pedal'); $('pedalModeRow').classList.toggle('hidden',S.bassMode!=='pedal');
@@ -736,6 +847,10 @@ function renderAll(){
   const mel=S.melody!=='off' && S.mode!=='single';
   $('invSeg').classList.toggle('dimmed',mel); $('rangeRow').classList.toggle('dimmed',mel);
   pedalSync();
+  document.querySelectorAll('.arponly').forEach(r=>r.classList.toggle('hidden',S.rhythm!=='arp'));
+  const euc=S.rhythm==='euclid'; $('eucPanel').classList.toggle('hidden',!euc); $('ringRow').classList.toggle('hidden',!euc); document.querySelector('.kbwrap').classList.toggle('hidden',euc);
+  ['arpRateSeg','arpSwing'].forEach(id=>$(id).closest('.row').classList.toggle('dimmed',S.rhythm==='off'));
+  renderLanes();
   $('arpGate').value=S.arpGate; $('arpGateVal').textContent=S.arpGate+'%';
   $('arpSwing').value=S.arpSwing; $('arpSwingVal').textContent=S.arpSwing===50?'straight':S.arpSwing+'%';
   $('velFixedRow').classList.toggle('hidden',S.velMode!=='fixed');
@@ -743,12 +858,12 @@ function renderAll(){
   $('velMin').value=S.velMin; $('velMinVal').textContent=S.velMin;
   $('strum').value=S.strum; $('strumVal').textContent=strumLabel(); $('bpm').value=S.bpm;
   $('strumMsRow').classList.toggle('hidden',!S.strumOn||S.strumMode!=='ms'); $('dirRow').classList.toggle('hidden',!S.strumOn); $('strumModeSeg').classList.toggle('dimmed',!S.strumOn);
-  $('strumDivRow').classList.toggle('hidden',!S.strumOn||S.strumMode!=='sync'); $('tempoRow').classList.toggle('hidden',!(S.strumOn&&S.strumMode==='sync') && !S.arpOn);
+  $('strumDivRow').classList.toggle('hidden',!S.strumOn||S.strumMode!=='sync'); $('tempoRow').classList.toggle('hidden',!(S.strumOn&&S.strumMode==='sync') && S.rhythm==='off');
   $('velFixed').value=S.velFixed; $('velFixedVal').textContent=S.velFixed;
   $('key').value=S.key; $('scale').value=S.scale; $('outCh').value=S.outCh; $('voices').value=S.voices;
   $('bypass').setAttribute('aria-pressed',!!S.bypass); $('tips').setAttribute('aria-pressed',!!S.tips);
   document.body.classList.toggle('notips',!S.tips); document.querySelector('.display').classList.toggle('bypassed',!!S.bypass); document.body.classList.toggle('bypassed',!!S.bypass);
-  $('modeHint').textContent = (S.bypass ? 'Bypassed: single notes' : S.mode==='single' ? 'Single notes' : S.mode==='memory' ? `Slot ${S.activeSlot+1} · ${quality(S.slots[S.activeSlot])}` : S.mode==='type' ? `Every key plays ${S.type}` : `${NN[S.key]} ${S.scale}`) + (S.arpOn&&!S.bypass ? ` · Arp ${S.arpPattern} ${S.arpRate}` : '');
+  $('modeHint').textContent = (S.bypass ? 'Bypassed: single notes' : S.mode==='single' ? 'Single notes' : S.mode==='memory' ? `Slot ${S.activeSlot+1} · ${quality(S.slots[S.activeSlot])}` : S.mode==='type' ? `Every key plays ${S.type}` : `${NN[S.key]} ${S.scale}`) + (rhythmOn() ? (S.rhythm==='arp' ? ` · Arp ${S.arpPattern} ${S.arpRate}` : ` · Euclid ${S.arpRate}`) : '');
   renderSlots(); renderTypes(); renderDegrees(); renderLearn();
 }
 
@@ -771,7 +886,7 @@ function init(){
   const degUp=e=>{ const n=degPtr.get(e.pointerId); if(n!==undefined){ degPtr.delete(e.pointerId); noteOff(1,n); } };
   ['pointerup','pointercancel','pointerleave'].forEach(t=>$('degrees').addEventListener(t,degUp));
   window._toggleBypass=toggleBypass;
-  ['modeSeg','sizeSeg','oosSeg','invSeg','spreadSeg','octSeg','dirSeg','velSeg','strumModeSeg','divSeg','arpPatSeg','arpRateSeg','arpOctSeg','curveSeg','melSeg','bassSeg','pedalModeSeg'].forEach(wireSeg);
+  ['modeSeg','sizeSeg','oosSeg','invSeg','spreadSeg','octSeg','dirSeg','velSeg','strumModeSeg','divSeg','arpPatSeg','arpRateSeg','arpOctSeg','curveSeg','melSeg','bassSeg','pedalModeSeg','rhySeg'].forEach(wireSeg);
   $('velMin').oninput=e=>{ S.velMin=+e.target.value; save(); renderAll(); };
   $('arpGate').oninput=e=>{ S.arpGate=+e.target.value; save(); renderAll(); };
   $('arpSwing').oninput=e=>{ S.arpSwing=+e.target.value; save(); renderAll(); };
@@ -782,7 +897,6 @@ function init(){
     if(k==='latch' && !S.latch){ for(const [key,e] of active) if(e.latched){ release(e); active.delete(key);} renderKb(); }
     if(k==='preview'){ if(S.preview) ensureAudio(); else synthAllOff(); }
     if(k==='smooth') lastVoicing=null;
-    if(k==='arpOn'){ S.arpOn=!S.arpOn; releaseAll(); active.clear(); S.arpOn=!S.arpOn; arpIdx=0; arpStep=0; arpNext=0; }
     renderAll();
   }));
   $('slots').addEventListener('click',e=>{ const b=e.target.closest('[data-i]'); if(!b) return; S.activeSlot=+b.dataset.i; save(); renderAll(); });
@@ -797,10 +911,11 @@ function init(){
   $('learnCancel').onclick=stopLearn;
   $('panic').onclick=panic;
   document.addEventListener('keydown',e=>{
-    if(e.target.tagName==='SELECT'||e.metaKey||e.ctrlKey) return;
+    if(e.target.tagName==='SELECT'||e.target.tagName==='INPUT'||e.metaKey||e.ctrlKey) return;
     if(e.key==='Escape'){ learning?stopLearn():panic(); }
     if(e.key==='b'||e.key==='B') window._toggleBypass();
-    if(e.key==='a'||e.key==='A') document.querySelector('.toggle[data-key=arpOn]').click();
+    if(e.key==='a'||e.key==='A') setRhythm(S.rhythm==='arp'?'off':'arp');
+    if(e.key==='e'||e.key==='E') setRhythm(S.rhythm==='euclid'?'off':'euclid');
     if(/^[1-8]$/.test(e.key)){ S.activeSlot=+e.key-1; if(S.mode!=='memory') S.mode='memory'; save(); renderAll(); }
   });
   if(S.preview) document.addEventListener('pointerdown',ensureAudio,{once:true});
