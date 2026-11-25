@@ -193,7 +193,7 @@ input[type=range]{flex:1;accent-color:var(--accent);min-width:100px}
     <div class="row" id="dirRow"><span class="lbl">Direction</span><div class="seg" id="dirSeg" data-key="strumDir"><button data-v="up">Up</button><button data-v="down">Down</button><button data-v="alt">Alternate</button></div></div>
     <div class="row"><span class="lbl">Velocity</span><div class="seg" id="velSeg" data-key="velMode"><button data-v="played">As played</button><button data-v="fixed">Fixed</button></div></div>
     <div class="row" id="velCurveRow"><span class="lbl">Curve</span><div class="seg" id="curveSeg" data-key="velCurve"><button data-v="softer" title="Much louder for light hits">Softer</button><button data-v="soft" title="Louder for light hits">Soft</button><button data-v="linear" title="As the keyboard sends it">Linear</button><button data-v="hard" title="Need to hit harder for loud notes">Hard</button></div></div>
-    <div class="row" id="velMinRow"><span class="lbl">Minimum</span><input type="range" id="velMin" min="1" max="110" title="Lowest velocity sent, however lightly you hit"><span class="val" id="velMinVal"></span></div>
+    <div class="row" id="velMinRow"><span class="lbl">Minimum</span><input type="range" id="velMin" min="1" max="120" title="Lowest velocity sent: softer hits are raised to this, harder hits go out unchanged"><span class="val" id="velMinVal"></span></div>
     <div class="row" id="velFixedRow"><span class="lbl">Fixed vel.</span><input type="range" id="velFixed" min="1" max="127"><span class="val" id="velFixedVal"></span></div>
     <div class="row">
       <button class="toggle" data-key="latch" title="Chord keeps sounding until the next one">Latch</button>
@@ -266,7 +266,7 @@ input[type=range]{flex:1;accent-color:var(--accent);min-width:100px}
   <section class="kbwrap a-kb"><div class="kb" id="kb"></div></section>
   <section class="card fx a-euc hidden" id="eucPanel"><div class="lanes" id="lanes"></div></section>
 </main>
-<footer class="credit"><div class="frow"><p class="disc">Works in Chrome and Edge, which support Web MIDI, with any MIDI keyboard.</p><p class="line"><a class="kofi" href="https://ko-fi.com/optfx">Support OPT-FX on Ko-fi</a><span class="sep">·</span><span>Made by OPT</span><span class="ver" title="Build 27">v1.3</span><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></p></div></footer>
+<footer class="credit"><div class="frow"><p class="disc">Works in Chrome and Edge, which support Web MIDI, with any MIDI keyboard.</p><p class="line"><a class="kofi" href="https://ko-fi.com/optfx">Support OPT-FX on Ko-fi</a><span class="sep">·</span><span>Made by OPT</span><span class="ver" title="Build 28">v1.3</span><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></p></div></footer>
 
 <script>
 "use strict";
@@ -570,7 +570,8 @@ setInterval(arpTick,5);
 const CURVES={linear:1, soft:0.6, softer:0.4, hard:1.6};
 function mapVel(v){
   const y=Math.pow(v/127, CURVES[S.velCurve]||1);
-  return Math.max(1,Math.min(127,Math.round(S.velMin+(127-S.velMin)*y)));
+  // Minimum is a floor: hits above it go out at their real (curved) value, softer ones are raised to it
+  return Math.max(S.velMin,Math.min(127,Math.max(1,Math.round(127*y))));
 }
 function showVel(inV,outV){ const el=$('velInfo'); if(el) el.textContent=`vel in ${inV} → out ${outV}`; }
 
@@ -1002,7 +1003,7 @@ init();
 </script>
 <script>
 // ---------- App: offline use, install offer, window size, update note ----------
-const BUILD = '27', VERSION_LABEL = 'v1.3';
+const BUILD = '28', VERSION_LABEL = 'v1.3';
 try {
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost') && !/claude\.ai$/.test(location.hostname))
     navigator.serviceWorker.register('sw.js').catch(() => {});
