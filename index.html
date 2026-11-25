@@ -40,6 +40,7 @@ body.notips .tip{display:none}
 footer.credit{max-width:1280px;margin:0 auto;padding:0 16px 8px;color:var(--muted);font-size:11px;letter-spacing:.04em;opacity:.85}
 footer.credit .line{display:flex;align-items:center;justify-content:flex-end;gap:7px;margin:0;line-height:1;flex-wrap:wrap}
 footer.credit .sep{opacity:.5}
+footer.credit .frow{display:flex;align-items:center;justify-content:space-between;gap:24px}footer.credit .disc{margin:0;flex:1;min-width:0;line-height:1.5;text-align:left}footer.credit .frow .line{flex:none}
 footer.credit .ver{opacity:.6;margin-left:10px}
 footer.credit svg{width:18px;height:18px;flex:none;transform:translateY(-1px)}
 .bypassbar{display:none;max-width:1280px;margin:0 auto;padding:0 16px 10px;cursor:pointer}
@@ -265,7 +266,7 @@ input[type=range]{flex:1;accent-color:var(--accent);min-width:100px}
   <section class="kbwrap a-kb"><div class="kb" id="kb"></div></section>
   <section class="card fx a-euc hidden" id="eucPanel"><div class="lanes" id="lanes"></div></section>
 </main>
-<footer class="credit"><p class="line"><a class="kofi" href="https://ko-fi.com/optfx">Support OPT on Ko-fi</a><span class="sep">·</span><span>QuChord: made by OPT</span><span class="ver" title="Build 23">v1.3</span><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></p></footer>
+<footer class="credit"><div class="frow"><p class="disc">Works in Chrome and Edge, which support Web MIDI, with any MIDI keyboard.</p><p class="line"><a class="kofi" href="https://ko-fi.com/optfx">Support OPT on Ko-fi</a><span class="sep">·</span><span>Made by OPT</span><span class="ver" title="Build 24">v1.3</span><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></p></div></footer>
 
 <script>
 "use strict";
@@ -1001,7 +1002,7 @@ init();
 </script>
 <script>
 // ---------- App: offline use, install offer, window size, update note ----------
-const BUILD = '23', VERSION_LABEL = 'v1.3';
+const BUILD = '24', VERSION_LABEL = 'v1.3';
 try {
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost') && !/claude\.ai$/.test(location.hostname))
     navigator.serviceWorker.register('sw.js').catch(() => {});
