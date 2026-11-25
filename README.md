@@ -6,9 +6,9 @@ QuChord sits between a MIDI keyboard and your synths. Play one note and it sends
 
 The whole app is one HTML file and runs in the browser with no install. Made by OPT.
 
-**Use it now: https://opt-fx.github.io/quchord/**
+**Use it now: https://opt-fx.com/quchord/**
 
-**Status: version 1.2.1.**
+**Status: version 1.3.**
 
 ## What it does
 
@@ -31,6 +31,10 @@ The whole app is one HTML file and runs in the browser with no install. Made by 
 - **Preview sound.** Hear the output in the browser, with or without MIDI connected.
 
 Settings are remembered in the browser.
+
+## Install it as an app
+
+QuChord can be installed so it opens from the Dock or Start menu in its own window and works without a connection. In Chrome or Edge, click **Install app** at the top of the page, or the install icon at the right of the address bar. In Safari on a Mac (macOS Sonoma or later), choose File → Add to Dock; Safari can't use Web MIDI, though, so Chrome or Edge is the one to use with a keyboard. It opens instantly from the copy on your computer and checks for an update in the background, so a new version appears the next time you open it, with a one-line note at the top. To send someone straight to the install offer, link to [opt-fx.com/quchord/#install](https://opt-fx.com/quchord/#install).
 
 ## Quick start
 
