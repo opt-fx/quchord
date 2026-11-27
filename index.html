@@ -284,7 +284,7 @@ a.homelogo { display:inline-flex; line-height:0; } a.homelogo:hover { opacity:.8
   <section class="kbwrap a-kb"><div class="kb" id="kb"></div></section>
   <section class="card fx a-euc hidden" id="eucPanel"><div class="lanes" id="lanes"></div></section>
 </main>
-<footer class="credit"><div class="frow"><p class="disc">Works in Chrome and Edge, which support Web MIDI, with any MIDI keyboard.</p><p class="line"><a class="kofi" href="https://ko-fi.com/optfx">Support OPT-FX on Ko-fi</a><span class="sep">·</span><a class="kofi home" href="https://opt-fx.com/" target="_blank" rel="noopener" title="All the OPT-FX apps">More apps at opt-fx.com</a><span class="sep">·</span><span>Made by OPT</span><span class="ver" title="Build 33">v1.3</span><a class="homelogo" href="https://opt-fx.com/" target="_blank" rel="noopener" title="OPT-FX home" aria-label="OPT-FX home"><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></a></p></div></footer>
+<footer class="credit"><div class="frow"><p class="disc">Works in Chrome and Edge, which support Web MIDI, with any MIDI keyboard.</p><p class="line"><a class="kofi" href="https://ko-fi.com/optfx">Support OPT-FX on Ko-fi</a><span class="sep">·</span><a class="kofi home" href="https://opt-fx.com/" target="_blank" rel="noopener" title="All the OPT-FX apps">More apps at opt-fx.com</a><span class="sep">·</span><span>Made by OPT</span><span class="ver" title="Build 34">v1.3</span><a class="homelogo" href="https://opt-fx.com/" target="_blank" rel="noopener" title="OPT-FX home" aria-label="OPT-FX home"><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></a></p></div></footer>
 
 <script>
 "use strict";
@@ -841,7 +841,7 @@ let lanesBuilt=false;
 function renderLanes(){
   const box=$('lanes');
   if(!lanesBuilt){
-    const NOTE_OPTS=[['low','Low'],['2nd','2nd'],['3rd','3rd'],['top','Top'],['cycle','Cycle'],['random','Rand']].map(([v,t])=>`<option value="${v}">${t}</option>`).join('');
+    const NOTE_OPTS=[['low','Low'],['2nd','2nd'],['3rd','3rd'],['top','Top'],['cycle','Cycle'],['random','Random']].map(([v,t])=>`<option value="${v}">${t}</option>`).join('');
     const INT_OPTS=[[-7,'−5th'],[-5,'−4th'],[0,'0'],[3,'+m3'],[4,'+M3'],[5,'+4th'],[7,'+5th'],[10,'+m7'],[12,'+8ve']].map(([v,t])=>`<option value="${v}">${t}</option>`).join('');
     const OCT_OPTS=[-2,-1,0,1,2].map(o=>`<option value="${o}">${o>0?'+'+o:o===0?'0':'−'+(-o)}</option>`).join('');
     const head='<span></span>'+['Steps','Hits','Rot','Note','Oct','Int','Vel','Gate','Chance'].map(x=>`<span class="hd">${x}</span>`).join('')+'<span></span><span class="hd" style="padding-left:8px">Pattern</span>';
@@ -1030,7 +1030,7 @@ init();
 </script>
 <script>
 // ---------- App: offline use, install offer, window size, update note ----------
-const BUILD = '33', VERSION_LABEL = 'v1.3';
+const BUILD = '34', VERSION_LABEL = 'v1.3';
 try {
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost') && !/claude\.ai$/.test(location.hostname))
     navigator.serviceWorker.register('sw.js').catch(() => {});
