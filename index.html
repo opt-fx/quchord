@@ -72,8 +72,10 @@ main{max-width:1280px;margin:0 auto;padding:10px 16px 8px;display:grid;gap:10px;
 .ringrow{display:flex;justify-content:center;margin:2px 0 8px}
 #rings{width:150px;height:150px}
 .a-rhy-euc{display:flex;flex-direction:column}
-.lanes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 28px}
-.lanes .half{display:grid;grid-template-columns:46px repeat(3,minmax(0,1fr)) minmax(0,1.6fr) minmax(0,1.2fr) repeat(3,minmax(0,1fr)) 34px;gap:5px 6px;align-items:center}
+.lanes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 18px}
+.lanes input[type=number]{-moz-appearance:textfield;appearance:textfield}
+.lanes input[type=number]::-webkit-inner-spin-button,.lanes input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.lanes .half{display:grid;grid-template-columns:42px repeat(3,minmax(0,1fr)) minmax(0,1.7fr) minmax(0,1.3fr) minmax(0,1.5fr) repeat(3,minmax(0,1fr)) 32px;gap:5px 5px;align-items:center}
 .lanes .hd{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 .lanes input[type=number]{width:100%;padding:4px 6px}
 .lanes .sel select{padding:4px 2px 4px 6px}
@@ -268,13 +270,13 @@ a.homelogo { display:inline-flex; line-height:0; } a.homelogo:hover { opacity:.8
     <div class="row arponly"><span class="lbl">Gate</span><input type="range" id="arpGate" min="10" max="100" title="How long each note lasts as a share of the step: short = staccato, 100% = legato"><span class="val" id="arpGateVal"></span></div>
     <div class="ringrow hidden" id="ringRow"><svg id="rings" viewBox="0 0 150 150" aria-label="Euclidean lanes: one ring per lane, filled dots are hits"></svg></div>
     <div class="row"><span class="lbl">Swing</span><input type="range" id="arpSwing" min="50" max="75" title="50% = straight; 66% = triplet shuffle; 75% = hard swing"><span class="val" id="arpSwingVal"></span></div>
-    <p class="tip"><b>Arp</b> and <b>Euclid</b> both run from the notes QuChord would play, so they follow the chord you hold. The arpeggiator plays whatever QuChord would play (the chord's notes, or the keys you hold in <b>Single notes</b> mode) one at a time, in time with the tempo. For a bassline: choose <b>Single notes</b>, hold one key, set Octaves to 2 and try <b>Up</b> at 1/16. Hold two or three keys to make a pattern from them, and turn on <b>Latch</b> to keep it running hands-free. With a port chosen in <b>Clock in</b> (Routing), it locks to that MIDI clock, starts new notes on the next step and restarts its pattern when the sequencer starts. Without one, it uses the manual tempo in Performance. <b>Gate</b> sets note length, and <b>Swing</b> delays every second step for shuffle. <b>Euclid</b> shows four lanes in place of the keyboard, with a ring for each lane here. Each lane spreads its <b>Hits</b> as evenly as possible over its <b>Steps</b> (3 hits in 8 steps is the classic tresillo), <b>Rotate</b> shifts where the pattern starts, and <b>Note</b> picks which chord note it plays: Low, 2nd, 3rd, Top, Cycle (each hit moves up the chord) or Random. Give lanes different lengths and they drift against each other, so the pattern keeps evolving. <b>Chance</b> lets hits drop out at random. Rate and Swing apply to all lanes. The <b>dice</b> randomise a lane, or every lane that's on (or the arpeggiator in Arp mode); press <b>R</b> to roll. Lane 1 stays a sparse bass lane, so a roll keeps a groove underneath.</p>
+    <p class="tip"><b>Arp</b> and <b>Euclid</b> both run from the notes QuChord would play, so they follow the chord you hold. The arpeggiator plays whatever QuChord would play (the chord's notes, or the keys you hold in <b>Single notes</b> mode) one at a time, in time with the tempo. For a bassline: choose <b>Single notes</b>, hold one key, set Octaves to 2 and try <b>Up</b> at 1/16. Hold two or three keys to make a pattern from them, and turn on <b>Latch</b> to keep it running hands-free. With a port chosen in <b>Clock in</b> (Routing), it locks to that MIDI clock, starts new notes on the next step and restarts its pattern when the sequencer starts. Without one, it uses the manual tempo in Performance. <b>Gate</b> sets note length, and <b>Swing</b> delays every second step for shuffle. <b>Euclid</b> shows four lanes in place of the keyboard, with a ring for each lane here. Each lane spreads its <b>Hits</b> as evenly as possible over its <b>Steps</b> (3 hits in 8 steps is the classic tresillo), <b>Rotate</b> shifts where the pattern starts, and <b>Int</b> shifts a lane's note by an interval (+5th, +octave and so on), so even one held key can play more than one pitch. <b>Note</b> picks which chord note it plays: Low, 2nd, 3rd, Top, Cycle (each hit moves up the chord) or Random. Give lanes different lengths and they drift against each other, so the pattern keeps evolving. <b>Chance</b> lets hits drop out at random. Rate and Swing apply to all lanes. The <b>dice</b> randomise a lane, or every lane that's on (or the arpeggiator in Arp mode); press <b>R</b> to roll. Lane 1 stays a sparse bass lane, so a roll keeps a groove underneath.</p>
   </section>
 
   <section class="kbwrap a-kb"><div class="kb" id="kb"></div></section>
   <section class="card fx a-euc hidden" id="eucPanel"><div class="lanes" id="lanes"></div></section>
 </main>
-<footer class="credit"><div class="frow"><p class="disc">Works in Chrome and Edge, which support Web MIDI, with any MIDI keyboard.</p><p class="line"><a class="kofi" href="https://ko-fi.com/optfx">Support OPT-FX on Ko-fi</a><span class="sep">·</span><a class="kofi home" href="https://opt-fx.com/" target="_blank" rel="noopener" title="All the OPT-FX apps">More apps at opt-fx.com</a><span class="sep">·</span><span>Made by OPT</span><span class="ver" title="Build 31">v1.3</span><a class="homelogo" href="https://opt-fx.com/" target="_blank" rel="noopener" title="OPT-FX home" aria-label="OPT-FX home"><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></a></p></div></footer>
+<footer class="credit"><div class="frow"><p class="disc">Works in Chrome and Edge, which support Web MIDI, with any MIDI keyboard.</p><p class="line"><a class="kofi" href="https://ko-fi.com/optfx">Support OPT-FX on Ko-fi</a><span class="sep">·</span><a class="kofi home" href="https://opt-fx.com/" target="_blank" rel="noopener" title="All the OPT-FX apps">More apps at opt-fx.com</a><span class="sep">·</span><span>Made by OPT</span><span class="ver" title="Build 32">v1.3</span><a class="homelogo" href="https://opt-fx.com/" target="_blank" rel="noopener" title="OPT-FX home" aria-label="OPT-FX home"><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></a></p></div></footer>
 
 <script>
 "use strict";
@@ -347,10 +349,10 @@ const DEFAULTS = {
   strumOn:false, strumMode:'ms', strumDiv:'1/16', bpm:120, clockName:'', useClock:true,
   rhythm:'off', arpPattern:'up', arpRate:'1/16', arpOct:1, arpGate:60, arpSwing:50, velCurve:'linear', velMin:1,
   lanes:[
-    {on:true, steps:16,hits:4,rotate:0,note:'low',oct:-1,vel:110,gate:50,prob:100},
-    {on:true, steps:8, hits:3,rotate:0,note:'cycle',oct:0,vel:90,gate:40,prob:100},
-    {on:true, steps:12,hits:5,rotate:2,note:'top',oct:1,vel:80,gate:30,prob:85},
-    {on:false,steps:5, hits:2,rotate:0,note:'random',oct:1,vel:70,gate:25,prob:60}]
+    {on:true, steps:16,hits:4,rotate:0,note:'low',oct:-1,int:0,vel:110,gate:50,prob:100},
+    {on:true, steps:8, hits:3,rotate:0,note:'cycle',oct:0,int:0,vel:90,gate:40,prob:100},
+    {on:true, steps:12,hits:5,rotate:2,note:'top',oct:1,int:0,vel:80,gate:30,prob:85},
+    {on:false,steps:5, hits:2,rotate:0,note:'random',oct:1,int:0,vel:70,gate:25,prob:60}]
 };
 let S = structuredClone(DEFAULTS);
 try{ const s=JSON.parse(localStorage.getItem('quchord.v1')||'null'); if(s){ if(!s.layoutV){ s.tips=false; s.layoutV=2; } delete s.arpVel; if(s.strumDiv==='off') s.strumDiv='1/16'; if(s.arpOn!==undefined){ s.rhythm=s.arpOn?'arp':'off'; delete s.arpOn; } if(s.lanes) s.lanes=DEFAULTS.lanes.map((d,i)=>Object.assign({},d,s.lanes[i]||{})); if(s.strumOn===undefined){ s.strumOn = s.strumMode==='sync' || s.strum>0; if(!s.strum) s.strum=30; } if(s.smooth) s.inversion='smooth'; if(s.bass) s.bassMode='root'; delete s.smooth; delete s.bass; S=Object.assign(S,s); } }catch(e){}
@@ -544,7 +546,7 @@ function euclidStep(t,stepMs,stepNo){
     if(Math.random()*100>=L.prob) return;
     const idx = L.note==='low'?0 : L.note==='2nd'?1 : L.note==='3rd'?2 : L.note==='top'?pool.length-1
       : L.note==='cycle'?laneCyc[i]++ : Math.floor(Math.random()*pool.length);
-    const it=pool[idx%pool.length], n=it.n+12*L.oct;
+    const it=pool[idx%pool.length], n=it.n+12*L.oct+(L.int||0);
     if(n<0||n>127||played.has(n)) return;
     if(S.voices>0 && outCount.size>=S.voices) return; // earlier lanes win when the synth runs out of voices
     played.add(n); playNote(n,it.ch,L.vel,t,stepMs,L.gate);
@@ -813,6 +815,7 @@ function randomLane(i){
   Object.assign(L,{steps, hits:1+rnd(maxH), rotate:rnd(steps),
     note: i===0?pick(['low','low','2nd','cycle']):pick(['2nd','3rd','top','cycle','cycle','random']),
     oct: i===0?pick([-1,-1,0]):pick([-1,0,0,1,1]),
+    int: i===0?0:pick([0,0,0,7,7,12,5,-5]),
     vel:70+rnd(51), gate:20+rnd(51), prob:i===0?pick([100,100,90]):pick([100,100,100,90,80,70,60])});
 }
 function randomArp(){
@@ -830,9 +833,10 @@ let lanesBuilt=false;
 function renderLanes(){
   const box=$('lanes');
   if(!lanesBuilt){
-    const NOTE_OPTS=[['low','Low'],['2nd','2nd'],['3rd','3rd'],['top','Top'],['cycle','Cycle'],['random','Random']].map(([v,t])=>`<option value="${v}">${t}</option>`).join('');
+    const NOTE_OPTS=[['low','Low'],['2nd','2nd'],['3rd','3rd'],['top','Top'],['cycle','Cycle'],['random','Rand']].map(([v,t])=>`<option value="${v}">${t}</option>`).join('');
+    const INT_OPTS=[[-7,'−5th'],[-5,'−4th'],[0,'0'],[3,'+m3'],[4,'+M3'],[5,'+4th'],[7,'+5th'],[10,'+m7'],[12,'+8ve']].map(([v,t])=>`<option value="${v}">${t}</option>`).join('');
     const OCT_OPTS=[-2,-1,0,1,2].map(o=>`<option value="${o}">${o>0?'+'+o:o===0?'0':'−'+(-o)}</option>`).join('');
-    const head='<span></span>'+['Steps','Hits','Rot','Note','Oct','Vel','Gate','Chance'].map(x=>`<span class="hd">${x}</span>`).join('')+'<span></span>';
+    const head='<span></span>'+['Steps','Hits','Rot','Note','Oct','Int','Vel','Gate','Chance'].map(x=>`<span class="hd">${x}</span>`).join('')+'<span></span>';
     const rows=['',''];
     S.lanes.forEach((L,i)=>{
       rows[i>>1]+=`<button class="lanebtn" data-lane="${i}" data-k="on" title="Lane ${i+1} on/off"><i></i>${i+1}</button>`+
@@ -841,6 +845,7 @@ function renderLanes(){
         `<input type="number" data-lane="${i}" data-k="rotate" min="0" max="31" title="Rotate: shift where the pattern starts">`+
         `<span class="sel"><select data-lane="${i}" data-k="note" title="Which chord note this lane plays">${NOTE_OPTS}</select></span>`+
         `<span class="sel"><select data-lane="${i}" data-k="oct" title="Octave shift">${OCT_OPTS}</select></span>`+
+        `<span class="sel"><select data-lane="${i}" data-k="int" title="Interval: shifts this lane's note, so one held key can give you more than one pitch">${INT_OPTS}</select></span>`+
         `<input type="number" data-lane="${i}" data-k="vel" min="1" max="127" title="Velocity">`+
         `<input type="number" data-lane="${i}" data-k="gate" min="5" max="100" title="Note length as a share of the step (%)">`+
         `<input type="number" data-lane="${i}" data-k="prob" min="0" max="100" title="Chance each hit plays (%)">`+
@@ -854,7 +859,7 @@ function renderLanes(){
       else if(k==='dice') randomLane(i);
       else if(k==='note') L.note=el.value;
       else { let v=parseInt(el.value,10); if(isNaN(v)) return;
-        const lim={steps:[1,32],hits:[0,L.steps],rotate:[0,L.steps-1],oct:[-2,2],vel:[1,127],gate:[5,100],prob:[0,100]}[k];
+        const lim={steps:[1,32],hits:[0,L.steps],rotate:[0,L.steps-1],oct:[-2,2],int:[-12,12],vel:[1,127],gate:[5,100],prob:[0,100]}[k];
         v=Math.max(lim[0],Math.min(lim[1],v)); L[k]=v;
         if(k==='steps'){ L.hits=Math.min(L.hits,v); L.rotate=Math.min(L.rotate,v-1); } }
       save(); renderLanes(); renderRings(lastRingStep);
@@ -1011,7 +1016,7 @@ init();
 </script>
 <script>
 // ---------- App: offline use, install offer, window size, update note ----------
-const BUILD = '31', VERSION_LABEL = 'v1.3';
+const BUILD = '32', VERSION_LABEL = 'v1.3';
 try {
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost') && !/claude\.ai$/.test(location.hostname))
     navigator.serviceWorker.register('sw.js').catch(() => {});
