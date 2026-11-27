@@ -68,14 +68,22 @@ button.primary{background:var(--accent);border-color:var(--accent);color:#fff;fo
 main{max-width:1280px;margin:0 auto;padding:10px 16px 8px;display:grid;gap:10px;grid-template-columns:repeat(3,minmax(0,1fr));
   grid-template-areas:"disp disp disp" "route perf arp" "src src voice" "kb kb kb"}
 .a-disp{grid-area:disp}
-.a-euc{grid-area:kb;padding:10px 14px}
+.a-euc{grid-area:kb;padding:5px 14px 6px}
 .ringrow{display:flex;justify-content:center;margin:2px 0 8px}
-#rings{width:150px;height:150px}
+#rings{width:124px;height:124px}
 .a-rhy-euc{display:flex;flex-direction:column}
-.lanes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 18px}
+.lanes{display:block}
 .lanes input[type=number]{-moz-appearance:textfield;appearance:textfield}
 .lanes input[type=number]::-webkit-inner-spin-button,.lanes input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
-.lanes .half{display:grid;grid-template-columns:42px repeat(3,minmax(0,1fr)) minmax(0,1.7fr) minmax(0,1.3fr) minmax(0,1.5fr) repeat(3,minmax(0,1fr)) 32px;gap:5px 5px;align-items:center}
+.lanes .half{display:grid;grid-template-columns:50px repeat(3,58px) 92px 70px 82px repeat(3,58px) 34px minmax(0,1fr);gap:2px 8px;align-items:center}
+.lanes .half > *{min-height:0}
+.lanes .hd{line-height:1.1}
+.lanes input[type=number],.lanes .sel select{padding-top:1px;padding-bottom:1px;height:23px}
+.lanes .dicebtn{padding:1px 5px}.lanes .dicebtn svg{width:18px;height:18px}
+.lanes .lanebtn{padding:2px 7px}
+.strip{display:flex;gap:3px;align-items:center;overflow:hidden;padding-left:8px}
+.strip b{width:11px;height:11px;border-radius:2px;background:#2f3337;flex:none}
+.strip b.cur{outline:1.5px solid #fff;outline-offset:1px}
 .lanes .hd{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 .lanes input[type=number]{width:100%;padding:4px 6px}
 .lanes .sel select{padding:4px 2px 4px 6px}
@@ -276,7 +284,7 @@ a.homelogo { display:inline-flex; line-height:0; } a.homelogo:hover { opacity:.8
   <section class="kbwrap a-kb"><div class="kb" id="kb"></div></section>
   <section class="card fx a-euc hidden" id="eucPanel"><div class="lanes" id="lanes"></div></section>
 </main>
-<footer class="credit"><div class="frow"><p class="disc">Works in Chrome and Edge, which support Web MIDI, with any MIDI keyboard.</p><p class="line"><a class="kofi" href="https://ko-fi.com/optfx">Support OPT-FX on Ko-fi</a><span class="sep">·</span><a class="kofi home" href="https://opt-fx.com/" target="_blank" rel="noopener" title="All the OPT-FX apps">More apps at opt-fx.com</a><span class="sep">·</span><span>Made by OPT</span><span class="ver" title="Build 32">v1.3</span><a class="homelogo" href="https://opt-fx.com/" target="_blank" rel="noopener" title="OPT-FX home" aria-label="OPT-FX home"><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></a></p></div></footer>
+<footer class="credit"><div class="frow"><p class="disc">Works in Chrome and Edge, which support Web MIDI, with any MIDI keyboard.</p><p class="line"><a class="kofi" href="https://ko-fi.com/optfx">Support OPT-FX on Ko-fi</a><span class="sep">·</span><a class="kofi home" href="https://opt-fx.com/" target="_blank" rel="noopener" title="All the OPT-FX apps">More apps at opt-fx.com</a><span class="sep">·</span><span>Made by OPT</span><span class="ver" title="Build 33">v1.3</span><a class="homelogo" href="https://opt-fx.com/" target="_blank" rel="noopener" title="OPT-FX home" aria-label="OPT-FX home"><svg viewBox="0 0 400 400" role="img" aria-label="OPT logo: a striped sun"><defs><mask id="sunmaskf"><rect width="400" height="400" fill="#fff"/><rect y="224" width="400" height="8"/><rect y="262" width="400" height="13"/><rect y="302" width="400" height="18"/><rect y="344" width="400" height="24"/></mask></defs><circle cx="200" cy="200" r="196" fill="#FF8A1F" mask="url(#sunmaskf)"/></svg></a></p></div></footer>
 
 <script>
 "use strict";
@@ -836,10 +844,10 @@ function renderLanes(){
     const NOTE_OPTS=[['low','Low'],['2nd','2nd'],['3rd','3rd'],['top','Top'],['cycle','Cycle'],['random','Rand']].map(([v,t])=>`<option value="${v}">${t}</option>`).join('');
     const INT_OPTS=[[-7,'−5th'],[-5,'−4th'],[0,'0'],[3,'+m3'],[4,'+M3'],[5,'+4th'],[7,'+5th'],[10,'+m7'],[12,'+8ve']].map(([v,t])=>`<option value="${v}">${t}</option>`).join('');
     const OCT_OPTS=[-2,-1,0,1,2].map(o=>`<option value="${o}">${o>0?'+'+o:o===0?'0':'−'+(-o)}</option>`).join('');
-    const head='<span></span>'+['Steps','Hits','Rot','Note','Oct','Int','Vel','Gate','Chance'].map(x=>`<span class="hd">${x}</span>`).join('')+'<span></span>';
-    const rows=['',''];
+    const head='<span></span>'+['Steps','Hits','Rot','Note','Oct','Int','Vel','Gate','Chance'].map(x=>`<span class="hd">${x}</span>`).join('')+'<span></span><span class="hd" style="padding-left:8px">Pattern</span>';
+    let rows='';
     S.lanes.forEach((L,i)=>{
-      rows[i>>1]+=`<button class="lanebtn" data-lane="${i}" data-k="on" title="Lane ${i+1} on/off"><i></i>${i+1}</button>`+
+      rows+=`<button class="lanebtn" data-lane="${i}" data-k="on" title="Lane ${i+1} on/off"><i></i>${i+1}</button>`+
         `<input type="number" data-lane="${i}" data-k="steps" min="1" max="32" title="Steps: pattern length">`+
         `<input type="number" data-lane="${i}" data-k="hits" min="0" max="32" title="Hits: notes spread evenly over the steps">`+
         `<input type="number" data-lane="${i}" data-k="rotate" min="0" max="31" title="Rotate: shift where the pattern starts">`+
@@ -849,9 +857,10 @@ function renderLanes(){
         `<input type="number" data-lane="${i}" data-k="vel" min="1" max="127" title="Velocity">`+
         `<input type="number" data-lane="${i}" data-k="gate" min="5" max="100" title="Note length as a share of the step (%)">`+
         `<input type="number" data-lane="${i}" data-k="prob" min="0" max="100" title="Chance each hit plays (%)">`+
-        `<button class="dicebtn" data-lane="${i}" data-k="dice" aria-label="Randomise lane ${i+1}" title="Randomise lane ${i+1}">${DICE}</button>`;
+        `<button class="dicebtn" data-lane="${i}" data-k="dice" aria-label="Randomise lane ${i+1}" title="Randomise lane ${i+1}">${DICE}</button>`+
+        `<div class="strip" id="strip${i}" aria-hidden="true"></div>`;
     });
-    box.innerHTML=rows.map(r=>`<div class="half">${head}${r}</div>`).join(''); lanesBuilt=true;
+    box.innerHTML=`<div class="half">${head}${rows}</div>`; lanesBuilt=true;
     const onEdit=e=>{
       const el=e.target.closest('[data-lane]'); if(!el) return;
       const i=+el.dataset.lane, k=el.dataset.k, L=S.lanes[i];
@@ -892,6 +901,11 @@ function renderRings(step){
     }
   });
   svg.innerHTML=h;
+  S.lanes.forEach((L,i)=>{
+    const el=$('strip'+i); if(!el) return; const pos=step>=0?step%L.steps:-1; let t='';
+    for(let k=0;k<L.steps;k++){ const hit=euclidHit(L,k); t+=`<b${k===pos?' class="cur"':''}${hit?` style="background:${L.on?LANE_COL[i]:'#555a60'}"`:''}></b>`; }
+    el.innerHTML=t; el.style.opacity=L.on?'':'.45';
+  });
 }
 function renderAll(){
   ['modeSeg','sizeSeg','oosSeg','invSeg','spreadSeg','octSeg','dirSeg','velSeg','strumModeSeg','divSeg','arpPatSeg','arpRateSeg','arpOctSeg','curveSeg','melSeg','bassSeg','pedalModeSeg','rhySeg'].forEach(renderSeg);
@@ -1016,7 +1030,7 @@ init();
 </script>
 <script>
 // ---------- App: offline use, install offer, window size, update note ----------
-const BUILD = '32', VERSION_LABEL = 'v1.3';
+const BUILD = '33', VERSION_LABEL = 'v1.3';
 try {
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost') && !/claude\.ai$/.test(location.hostname))
     navigator.serviceWorker.register('sw.js').catch(() => {});
